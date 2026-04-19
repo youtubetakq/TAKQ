@@ -314,9 +314,7 @@ function handleLogin() {
   if (valid) {
     sessionStorage.setItem('loggedId', id);
     localStorage.setItem('loggedId', id);
-    // 메인 페이지로 이동 (같은 폴더에 main.html이 있을 경우)
-    // window.location.href = 'main.html';
-    alert('로그인 성공! (' + id + ')');
+    window.location.href = 'main_26.html';
   } else {
     showError();
   }
