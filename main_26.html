@@ -1513,6 +1513,8 @@ function dbAddPlayer() {
   const exists  = playerDB.findIndex(p => p.lol.toLowerCase() === lol.toLowerCase());
   if (exists !== -1) { alert('이미 등록된 선수예요.'); return; }
   playerDB.push({ chzz, lol, tier, mainPos, subPos, wins: 0, loses: 0, note: '', warnings: 0 });
+  const newIdx = playerDB.length - 1;
+  if(window.fbSavePlayer) window.fbSavePlayer(newIdx);
   renderPlayerDB();
   input.value = '';
 }
@@ -1707,12 +1709,14 @@ function addMatchRecord(winner) {
     return db?db.chzz:p.name;
   });
   matchRecords.unshift({ date, blueNames, redNames, bluePts, redPts, winner });
+  if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
   renderRecords();
 }
 
 function deleteRecord(idx) {
   if (!confirm('이 경기 기록을 삭제할까요?')) return;
   matchRecords.splice(idx, 1);
+  if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
   renderRecords();
 }
 
@@ -2174,6 +2178,7 @@ function recordResult(team, result) {
     // 승패 기록
     if (result === 'win')  playerDB[p.dbIdx].wins++;
     else                   playerDB[p.dbIdx].loses++;
+    if(window.fbSavePlayer) window.fbSavePlayer(p.dbIdx);
   });
 
   // 확인 알림 - 기록된 플레이어 목록 표시
@@ -2496,5 +2501,111 @@ renderTable2();
 renderMirror();
 </script>
 </div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDsbh3vBFf8W7vCWern9KMO9E2un3SovFs",
+    authDomain: "loltakq.firebaseapp.com",
+    projectId: "loltakq",
+    storageBucket: "loltakq.firebasestorage.app",
+    messagingSenderId: "360242154170",
+    appId: "1:360242154170:web:b85d91ba5acd49e554d083",
+    measurementId: "G-3FXVBJL8HZ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // ── DB 저장 함수들을 window에 노출 ──────────────────────────
+
+  // playerDB 전체 저장
+  window.fbSavePlayerDB = async function() {
+    try {
+      for (let i = 0; i < playerDB.length; i++) {
+        await setDoc(doc(db, 'playerDB', String(i)), { ...playerDB[i], _idx: i });
+      }
+    } catch(e) { console.error('playerDB 저장 실패', e); }
+  };
+
+  // playerDB 단건 저장
+  window.fbSavePlayer = async function(idx) {
+    try {
+      await setDoc(doc(db, 'playerDB', String(idx)), { ...playerDB[idx], _idx: idx });
+    } catch(e) { console.error('player 저장 실패', e); }
+  };
+
+  // playerDB 단건 삭제
+  window.fbDeletePlayer = async function(idx) {
+    try {
+      await deleteDoc(doc(db, 'playerDB', String(idx)));
+    } catch(e) { console.error('player 삭제 실패', e); }
+  };
+
+  // matchRecords 전체 저장
+  window.fbSaveMatchRecords = async function() {
+    try {
+      for (let i = 0; i < matchRecords.length; i++) {
+        await setDoc(doc(db, 'matchRecords', String(i)), { ...matchRecords[i], _idx: i });
+      }
+    } catch(e) { console.error('matchRecords 저장 실패', e); }
+  };
+
+  // matchRecord 단건 삭제
+  window.fbDeleteMatchRecord = async function(idx) {
+    try {
+      await deleteDoc(doc(db, 'matchRecords', String(idx)));
+      // 삭제 후 전체 재저장 (인덱스 재정렬)
+      await window.fbSaveMatchRecords();
+    } catch(e) { console.error('matchRecord 삭제 실패', e); }
+  };
+
+  // ── 초기 데이터 불러오기 ──────────────────────────────────
+  window.fbLoaded = false;
+
+  async function loadFromFirebase() {
+    try {
+      // playerDB 불러오기
+      const playerSnap = await getDocs(collection(db, 'playerDB'));
+      if (!playerSnap.empty) {
+        const arr = [];
+        playerSnap.forEach(d => { const data = d.data(); arr[data._idx] = data; });
+        playerDB = arr.filter(p => p !== undefined);
+        // _idx 필드 제거
+        playerDB.forEach(p => delete p._idx);
+      }
+
+      // matchRecords 불러오기
+      const matchSnap = await getDocs(collection(db, 'matchRecords'));
+      if (!matchSnap.empty) {
+        const arr = [];
+        matchSnap.forEach(d => { const data = d.data(); arr[data._idx] = data; });
+        matchRecords = arr.filter(r => r !== undefined);
+        matchRecords.forEach(r => delete r._idx);
+      }
+
+      window.fbLoaded = true;
+      console.log('✅ Firebase 데이터 로드 완료', playerDB.length, '명,', matchRecords.length, '경기');
+
+      // 화면 갱신
+      renderPlayerDB();
+      renderTable();
+
+    } catch(e) {
+      console.error('Firebase 로드 실패', e);
+      window.fbLoaded = true;
+    }
+  }
+
+  // 페이지 로드 후 Firebase에서 데이터 불러오기
+  window.addEventListener('load', () => {
+    setTimeout(loadFromFirebase, 500);
+  });
+
+</script>
+
 </body>
 </html>
