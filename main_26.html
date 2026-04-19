@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>고래요 내전방</title>
+<title>T 내전 관리 시스템</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: linear-gradient(135deg, #a8c8f0 0%, #c5b8e8 100%); min-height: 100vh; min-width: 900px; padding: 24px 40px; }
@@ -626,8 +626,8 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
       </div>
       <div class="banner">
         <div class="banner-user-info">
-          <div class="banner-user-id" id="bannerUserId">LOLTCK01</div>
-          <div class="banner-user-role" id="bannerUserRole">관리자</div>
+          <div class="banner-user-id" id="bannerUserId">-</div>
+          <div class="banner-user-role" id="bannerUserRole">-</div>
         </div>
         <img class="banner-logo" src="https://i.ibb.co/wh7hRJnQ/1.png" alt="로고"/>
       </div>
@@ -1034,30 +1034,11 @@ function getPosIndex(s) {
 }
 
 // ─── 데이터 ───
-let playerDB = [
-  {chzz:'탁큐',     lol:'그냥그런놈#0203', tier:'플레티넘2',       mainPos:3, subPos:[0,1], wins:7,  loses:4, note:'', warnings:0},
-  {chzz:'고래왕',   lol:'지수나#0207',    tier:'다이아 2',        mainPos:0, subPos:[2],   wins:10, loses:3, note:'', warnings:0},
-  {chzz:'정글러킹', lol:'dabido#kr2',    tier:'골드 4',          mainPos:1, subPos:[4],   wins:6,  loses:7, note:'', warnings:0},
-  {chzz:'미드장인', lol:'살러주세요#010', tier:'플레티넘 2',       mainPos:2, subPos:[3],   wins:5,  loses:6, note:'', warnings:1},
-  {chzz:'원딜마스터',lol:'오기오기#KR03',tier:'마스터 100LP',     mainPos:3, subPos:[2],   wins:14, loses:2, note:'', warnings:0},
-  {chzz:'서폿신',   lol:'지병구#999',    tier:'에메랄드 4',       mainPos:4, subPos:[0],   wins:8,  loses:5, note:'', warnings:0},
-];
+let playerDB = [];
 
 // blueTeam/redTeam: { name, tier, pts, pos, dbIdx(-1=없음) }
-let blueTeam = [
-  {name:'지수나#0207',     tier:'다이아 2',      pts:327, pos:0, dbIdx:1},
-  {name:'dabido#kr2',     tier:'골드 4',        pts:150, pos:1, dbIdx:2},
-  {name:'살러주세요#010',  tier:'플레티넘 2',     pts:216, pos:2, dbIdx:3},
-  {name:'오기오기#KR03',  tier:'마스터 100LP',   pts:357, pos:3, dbIdx:4},
-  {name:'지병구#999',     tier:'에메랄드 4',      pts:230, pos:4, dbIdx:5},
-];
-let redTeam = [
-  {name:'Akaps#KR992',     tier:'다이아 4',      pts:280, pos:0, dbIdx:-1},
-  {name:'귀공주님#0203',   tier:'플레티넘 2',     pts:216, pos:1, dbIdx:-1},
-  {name:'플라워가든#달빛', tier:'플레티넘 4',      pts:190, pos:2, dbIdx:-1},
-  {name:'나쁜선글#kr1',   tier:'다이아 3',        pts:303, pos:3, dbIdx:-1},
-  {name:'야기고양이#0713', tier:'다이아 4',       pts:280, pos:4, dbIdx:-1},
-];
+let blueTeam = [];
+let redTeam  = [];
 
 // ─── 드래그 상태 ───
 let dragState = null; // { team:'blue'|'red', idx:number }
@@ -1688,12 +1669,7 @@ function renderRosterTab() {
 // ═══════════════════════════════
 // RECORDS
 // ═══════════════════════════════
-let matchRecords = [
-  { date:'2026.04.19', blueNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], redNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], bluePts:1560, redPts:1480, winner:'blue' },
-  { date:'2026.04.19', blueNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], redNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], bluePts:1420, redPts:1510, winner:'red' },
-  { date:'2026.04.18', blueNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], redNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], bluePts:1390, redPts:1550, winner:'red' },
-  { date:'2026.04.18', blueNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], redNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], bluePts:1600, redPts:1400, winner:'blue' },
-]; // { date, blueNames, redNames, bluePts, redPts, winner }
+let matchRecords = [];
 
 function addMatchRecord(winner) {
   const now = new Date();
@@ -2491,8 +2467,8 @@ document.addEventListener('click', e=>{
   const acc = accounts.find(a => a.id === loggedId);
   const idEl   = document.getElementById('bannerUserId');
   const roleEl = document.getElementById('bannerUserRole');
-  if (idEl)   idEl.textContent = loggedId || 'LOLTCK01';
-  if (roleEl) roleEl.textContent = acc ? acc.role : '관리자';
+  if (idEl)   idEl.textContent   = loggedId || '-';
+  if (roleEl) roleEl.textContent = acc ? acc.role : '-';
 })();
 
 renderTable();
