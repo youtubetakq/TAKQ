@@ -1534,6 +1534,8 @@ function saveEdit(){
 function deletePlayer(idx){
   if(!confirm(`"${playerDB[idx].chzz}" 선수를 삭제할까요?`))return;
   playerDB.splice(idx,1);
+  // Firebase 전체 재동기화 (삭제 후 인덱스 재정렬)
+  if(window.fbFullSyncPlayerDB) window.fbFullSyncPlayerDB();
   renderPlayerDB();
 }
 
@@ -2497,6 +2499,25 @@ renderMirror();
   const db = getFirestore(app);
 
   // ── DB 저장 함수들을 window에 노출 ──────────────────────────
+
+  // playerDB 완전 동기화 (기존 전체 삭제 후 재저장)
+  window.fbFullSyncPlayerDB = async function() {
+    try {
+      // 1. 기존 Firebase playerDB 컬렉션 전체 문서 가져오기
+      const snap = await getDocs(collection(db, 'playerDB'));
+      // 2. 기존 문서 모두 삭제
+      const deletePromises = [];
+      snap.forEach(d => deletePromises.push(deleteDoc(doc(db, 'playerDB', d.id))));
+      await Promise.all(deletePromises);
+      // 3. 현재 playerDB 전체 재저장
+      const savePromises = [];
+      for (let i = 0; i < playerDB.length; i++) {
+        savePromises.push(setDoc(doc(db, 'playerDB', String(i)), { ...playerDB[i], _idx: i }));
+      }
+      await Promise.all(savePromises);
+      console.log('✅ playerDB 완전 동기화 완료');
+    } catch(e) { console.error('playerDB 동기화 실패', e); }
+  };
 
   // playerDB 전체 저장
   window.fbSavePlayerDB = async function() {
