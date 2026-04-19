@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>고래요 내전방</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: linear-gradient(135deg, #a8c8f0 0%, #c5b8e8 100%); min-height: 100vh; min-width: 900px; padding: 24px 40px; }
+.site-wrap { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+
+/* 네비 */
+.navbar { display: flex; width: 100%; border-bottom: 2px solid rgba(255,255,255,0.3); border-radius: 16px 16px 0 0; overflow: hidden; }
+.nav-item { flex: 1; padding: 14px 10px; text-align: center; font-size: 14px; font-weight: 600; color: #3a3a6a; cursor: pointer; border-right: 1px solid rgba(180,180,220,0.4); background: rgba(255,255,255,0.35); transition: background 0.2s; user-select: none; }
+.nav-item:last-child { border-right: none; }
+.nav-item:hover { background: rgba(255,255,255,0.55); }
+.nav-item.active { background: rgba(255,255,255,0.65); color: #2a2a6a; font-weight: 700; }
+
+/* 메인 */
+.main-content { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.top-area { display: flex; align-items: flex-start; gap: 16px; width: 100%; justify-content: space-between; flex-wrap: wrap; }
+
+/* 필터박스 */
+.filter-box { background: rgba(170,195,230,0.55); border: 1px solid rgba(255,255,255,0.55); border-radius: 8px; padding: 10px 14px; flex: 1 1 auto; width: fit-content; min-width: 0; }
+.filter-row1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.filter-row2 { display: flex; align-items: center; gap: 8px; position: relative; }
+.filter-label { font-size: 13px; color: #2a2a5a; font-weight: 600; white-space: nowrap; }
+.filter-select { padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(100,100,180,0.4); background: rgba(255,255,255,0.85); font-size: 13px; color: #333; cursor: pointer; outline: none; min-width: 80px; }
+.checkbox-wrap { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #2a2a5a; font-weight: 600; cursor: pointer; }
+.checkbox-wrap input[type=checkbox] { width: 16px; height: 16px; accent-color: #5a6fe8; cursor: pointer; }
+
+.btn { padding: 6px 14px; border-radius: 6px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
+.btn:hover { opacity: 0.85; }
+.btn:active { transform: scale(0.97); }
+.btn-auto { background: #7b6fe8; color: white; }
+.btn-random { background: #f0a050; color: white; }
+.btn-team { background: #e06060; color: white; }
+.btn-reset { background: rgba(255,255,255,0.7); color: #3a3a6a; border: 1px solid rgba(100,100,180,0.3); }
+.btn-search { background: rgba(255,255,255,0.7); color: #3a3a6a; border: 1px solid rgba(100,100,180,0.3); }
+.btn-edit { background: #5a8ae8; color: white; font-size: 12px; padding: 4px 10px; }
+.btn-del { background: #e84a4a; color: white; font-size: 12px; padding: 4px 10px; }
+
+.team-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid rgba(100,100,180,0.3); }
+.team-toggle .t-blue { padding: 5px 10px; background: #4a7fe8; color: white; font-size: 11px; font-weight: 700; cursor: pointer; line-height: 1.3; text-align: center; }
+.team-toggle .t-red { padding: 5px 10px; background: #e84a4a; color: white; font-size: 11px; font-weight: 700; cursor: pointer; line-height: 1.3; text-align: center; }
+
+.count-text { font-size: 13px; color: #3a3a6a; font-weight: 600; white-space: nowrap; }
+
+/* 검색창 */
+.search-wrap { position: relative; }
+.search-input { padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(100,100,180,0.3); background: rgba(255,255,255,0.75); font-size: 13px; color: #333; outline: none; width: 300px; }
+.search-input::placeholder { color: #aaa; }
+.search-dropdown { position: absolute; top: 110%; left: 0; width: 380px; background: white; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 999; max-height: 220px; overflow-y: auto; display: none; }
+.search-dropdown.show { display: block; }
+.search-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; transition: background 0.15s; }
+.search-item:last-child { border-bottom: none; }
+.search-item:hover { background: #f0eeff; }
+.search-item .s-nick { font-weight: 700; color: #4a3fc0; }
+.search-item .s-detail { font-size: 11px; color: #888; margin-top: 2px; }
+
+/* 배너 */
+.banner { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 1; padding: 0 4px; margin-left: auto; min-width: 0; }
+.banner-text { text-align: right; line-height: 1.5; }
+.banner-user-info {
+  text-align: right;
+  background: rgba(30,30,60,0.85);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 16px;
+}
+.banner-user-id {
+  font-size: clamp(13px, 1.4vw, 18px);
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffe87a, #f5a623, #ffe87a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+.banner-user-role {
+  display: inline-block;
+  font-size: clamp(10px, 1vw, 13px);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #7b6fe8, #4a7fe8);
+  padding: 2px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+.banner-logo { height: clamp(55px, 7vw, 100px); object-fit: contain; }
+
+/* VS 박스 */
+.vs-box { background: rgba(30,30,60,0.85); border-radius: 8px; padding: 14px 20px; color: white; }
+.vs-scores { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.score-blue { font-size: 28px; font-weight: 900; color: #6ab0ff; }
+.score-blue .pts { font-size: 13px; color: #aaa; font-weight: 400; margin-left: 2px; }
+.score-red { font-size: 28px; font-weight: 900; color: #ff6a6a; text-align: right; }
+.score-red .pts { font-size: 13px; color: #aaa; font-weight: 400; margin-left: 2px; }
+.vs-center { text-align: center; }
+.vs-label { font-size: 16px; font-weight: 700; color: #ccc; }
+.vs-diff { margin-top: 4px; background: rgba(255,255,255,0.15); border-radius: 20px; padding: 3px 14px; font-size: 12px; color: #ddd; white-space: nowrap; }
+.vs-bar-wrap { height: 6px; border-radius: 3px; margin-bottom: 8px; overflow: hidden; background: linear-gradient(90deg, #c04040 0%, #e84a4a 100%); position: relative; }
+.vs-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease, background 0.5s ease; position: relative; z-index: 1; }
+.vs-stats { display: flex; justify-content: space-between; font-size: 12px; color: #bbb; }
+.vs-stats .blue-stat::before { content: ''; display: inline-block; width: 8px; height: 8px; background: #4a7fe8; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.vs-stats .red-stat::after { content: ''; display: inline-block; width: 8px; height: 8px; background: #e84a4a; border-radius: 50%; margin-left: 5px; vertical-align: middle; }
+
+/* 플레이어 테이블 */
+.team-section-wrap { border-radius: 8px; overflow: hidden; }
+.mirror-teams { display: flex; gap: 12px; width: 100%; }
+.mirror-box {
+  flex: 1; min-width: 0;
+  background: rgba(30,30,60,0.85);
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.mirror-header {
+  padding: 10px 16px; font-size: 13px; font-weight: 700;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center;
+}
+.mirror-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-top: 1px solid rgba(255,255,255,0.07);
+}
+.mirror-empty { color: rgba(255,255,255,0.2); font-size: 12px; font-style: italic; }
+.mirror-btns { display: flex; gap: 8px; justify-content: flex-end; padding: 8px 16px; border-top: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.15); }
+.trash-area {
+  grid-column: 1;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 6px;
+  border: 1px dashed rgba(255,255,255,0.2);
+  cursor: pointer; transition: all 0.2s;
+  color: rgba(255,255,255,0.3);
+}
+.trash-area:hover { border-color: rgba(232,74,74,0.6); color: #ff6a6a; background: rgba(232,74,74,0.1); }
+.trash-area.drag-over { border-color: #ff6a6a; background: rgba(232,74,74,0.25); color: #ff6a6a; transform: scale(1.1); }
+.trash-icon { width: 18px; height: 18px; pointer-events: none; }
+.side-select-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer; transition: all 0.2s;
+  font-size: 18px; user-select: none;
+  background: rgba(255,255,255,0.05);
+  grid-column: 6;
+}
+.side-select-btn:hover { border-color: rgba(255,220,80,0.6); background: rgba(255,220,80,0.1); transform: scale(1.08); }
+
+/* 동전 뒤집기 게임 */
+.coin-modal { text-align: center; max-width: 360px; }
+.coin-modal h3 { color: #ffe033; }
+.coin-desc { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+.coin-wrap { perspective: 600px; margin: 0 auto 24px; width: 120px; height: 120px; }
+.coin {
+  width: 120px; height: 120px;
+  transform-style: preserve-3d;
+  position: relative;
+  transition: transform 0s;
+}
+.coin.flipping {
+  animation: coinFlip 1.2s ease-out forwards;
+}
+.coin.flipping.heads { animation-name: coinFlipHeads; }
+.coin.flipping.tails { animation-name: coinFlipTails; }
+@keyframes coinFlipHeads {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(1800deg); }
+}
+@keyframes coinFlipTails {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(1980deg); }
+}
+.coin-face {
+  position: absolute; width: 100%; height: 100%;
+  border-radius: 50%; backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900;
+  border: 4px solid rgba(255,255,255,0.2);
+}
+.coin-front {
+  background: radial-gradient(circle at 35% 35%, #ffe87a, #c8950a);
+  color: #7a4a00;
+}
+.coin-back {
+  background: radial-gradient(circle at 35% 35%, #e0e0e0, #888);
+  color: #333;
+  transform: rotateY(180deg);
+}
+.coin-btns { display: flex; gap: 12px; justify-content: center; margin-bottom: 16px; }
+.coin-choice-btn {
+  padding: 10px 28px; border-radius: 8px; border: none;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s; font-family: inherit;
+}
+.coin-choice-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.coin-choice-btn:active { transform: scale(0.96); }
+.btn-heads { background: linear-gradient(135deg, #ffe87a, #c8950a); color: #5a3000; }
+.btn-tails { background: linear-gradient(135deg, #e0e0e0, #888); color: #222; }
+.coin-result {
+  font-size: 15px; font-weight: 700; min-height: 24px;
+  padding: 8px 0; border-radius: 8px;
+}
+.coin-result.win  { color: #6ab0ff; }
+.coin-result.lose { color: #ff6a6a; }
+.player-table-wrap { background: rgba(30,30,60,0.85); border-radius: 0; overflow: visible; position: relative; }
+.table-header { display: grid; grid-template-columns: 70px 1fr 50px 70px 1fr; background: rgba(0,0,0,0.3); padding: 10px 16px; font-size: 13px; font-weight: 700; color: #ccc; border-radius: 8px 8px 0 0; }
+.th-blue { color: #6ab0ff; display: flex; align-items: center; gap: 6px; }
+.th-blue::before { content: ''; width: 10px; height: 10px; background: #4a7fe8; border-radius: 50%; display: inline-block; }
+.th-red { color: #ff6a6a; display: flex; align-items: center; gap: 6px; }
+.th-red::before { content: ''; width: 10px; height: 10px; background: #e84a4a; border-radius: 50%; display: inline-block; }
+.th-vs { text-align: center; color: #aaa; }
+.avg-tier { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-left: 6px; }
+
+/* 드래그 가능한 플레이어 행 */
+.player-row {
+  display: grid; grid-template-columns: 70px 1fr 50px 70px 1fr;
+  padding: 10px 16px; border-top: 1px solid rgba(255,255,255,0.07);
+  align-items: center; transition: background 0.15s;
+  cursor: default; user-select: none;
+  position: relative;
+}
+.player-row:hover { background: rgba(255,255,255,0.04); }
+/* 드래그 가능한 개별 셀 */
+.drag-cell {
+  display: flex; align-items: center; gap: 8px;
+  cursor: default; border-radius: 6px; padding: 3px 4px;
+  transition: background 0.15s;
+  flex-wrap: wrap;
+  position: relative;
+  min-height: 36px;
+}
+/* 드래그 중 자식 요소가 dragleave 발동시키지 않도록 */
+.drag-cell.drag-over > * { pointer-events: none; }
+.drag-cell:hover { background: rgba(255,255,255,0.08); }
+.drag-cell.dragging { opacity: 0.35; background: rgba(255,255,255,0.12); }
+.drag-cell.drag-over { background: rgba(255,255,255,0.18); outline: 2px solid rgba(255,255,255,0.4); outline-offset: 1px; }
+.drag-cell-blue.drag-over { outline-color: #4a7fe8; background: rgba(74,127,232,0.2); }
+.drag-cell-red.drag-over  { outline-color: #e84a4a; background: rgba(232,74,74,0.2); }
+.drag-cell-red { justify-content: flex-start; }
+
+.pos-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; color: white; text-align: center; min-width: 46px; cursor: pointer; }
+.pos-top    { background: #7b3a9e; }
+.pos-jungle { background: #2a7a3a; }
+.pos-mid    { background: #d4aa00; color: #fff; }
+.pos-bottom { background: #1a5aaa; }
+.pos-support{ background: #b03060; }
+.pos-all    { background: #ffffff; color: #222; }
+
+.player-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative; }
+.player-info-red { justify-content: flex-end; }
+.player-name { font-size: 14px; font-weight: 600; color: #eee; cursor: pointer; border-radius: 4px; padding: 2px 4px; transition: background 0.15s; }
+.player-name:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.drag-handle { color: #666; font-size: 14px; cursor: grab; padding: 0 2px; user-select: none; line-height: 1; }
+.drag-handle:hover { color: #aaa; }
+.drag-handle:active { cursor: grabbing; }
+
+.tier-badge { padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.tier-b  { background: #8B5A2B; color: #f5d9b0; }
+.tier-s  { background: #6b6b6b; color: #e0e0e0; }
+.tier-g  { background: #7a6000; color: #ffd700; }
+.tier-p  { background: #0e7a6a; color: #60f0d0; }
+.tier-e  { background: #1a7a3a; color: #60e890; }
+.tier-d  { background: #1a5aaa; color: #90c8ff; }
+.tier-m  { background: #6a0080; color: #e080ff; }
+.tier-gm { background: #9a1a1a; color: #ffaaaa; }
+.tier-c  { background: #00aadd; color: #ffffff; }
+.player-pts { font-size: 12px; color: #aaa; margin-left: 4px; }
+.vs-cell { text-align: center; font-size: 12px; color: #888; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+
+.total-row { display: grid; grid-template-columns: 70px 1fr 50px 70px 1fr; padding: 10px 16px; border-top: 2px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); font-size: 14px; font-weight: 700; border-radius: 0 0 8px 8px; }
+.total-blue { color: #6ab0ff; }
+.total-red { color: #ff6a6a; }
+
+/* 포지션 변경 팝업 */
+.pos-popup {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 9999;
+  background: #1e1e3c; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px; padding: 8px; min-width: 180px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  display: none;
+}
+.pos-popup.show { display: block; }
+.pos-popup-title { font-size: 11px; color: #aaa; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.pos-popup-item { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.pos-popup-item:hover { background: rgba(255,255,255,0.1); }
+.pos-popup-item .pp-label { font-size: 11px; color: #ccc; }
+.pos-popup-item.is-main .pp-label { color: #ffe033; font-weight: 700; }
+
+/* PLAYER DB */
+.playerdb-wrap { padding: 16px; }
+.playerdb-add-box {
+  background: rgba(170,195,230,0.45); border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 8px; padding: 10px 16px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.playerdb-add-box input {
+  flex: 1; min-width: 260px; padding: 7px 12px; border-radius: 6px;
+  border: 1px solid rgba(100,100,180,0.35); background: rgba(255,255,255,0.8);
+  font-size: 13px; color: #333; outline: none; font-family: inherit;
+}
+.playerdb-add-box input::placeholder { color: #aaa; }
+.playerdb-grid { display: flex; flex-direction: column; gap: 6px; }
+.player-card {
+  background: rgba(30,30,60,0.88); border-radius: 8px;
+  padding: 9px 14px; border: 1px solid rgba(255,255,255,0.1);
+  color: white; display: flex; align-items: center; gap: 14px; flex-wrap: nowrap;
+}
+.pc-names { min-width: 140px; max-width: 180px; }
+.pc-name { font-size: 13px; font-weight: 700; color: #00ffa3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-lol  { font-size: 11px; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-tier-wrap { flex-shrink: 0; width: 130px; }
+.pc-record { display: flex; gap: 8px; font-size: 12px; flex-shrink: 0; }
+.pc-win  { color: #6ab0ff; font-weight: 700; }
+.pc-lose { color: #ff6a6a; font-weight: 700; }
+.pc-rate { color: #ffe033; font-weight: 700; }
+.pc-pos  { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
+.pc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.pc-divider { width: 1px; background: rgba(255,255,255,0.15); align-self: stretch; flex-shrink: 0; margin: 0 4px; }
+.pc-no-player { text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 40px; }
+.warn-dot {
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; flex-shrink: 0;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+  vertical-align: middle; margin-right: 4px;
+}
+.pc-note { font-size: 11px; color: #ffcc66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; flex-shrink: 0; }
+
+/* 수정 모달 */
+.modal-bg { display: none; position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; }
+.modal-bg.show { display: flex; }
+.modal-box { background: #1e1e3c; border-radius: 12px; padding: 24px; width: 420px; color: white; border: 1px solid rgba(255,255,255,0.15); }
+.modal-box h3 { font-size: 16px; color: #ffe033; margin-bottom: 16px; }
+.modal-field { margin-bottom: 12px; }
+.modal-field label { font-size: 12px; color: #aaa; display: block; margin-bottom: 4px; }
+.modal-field input { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: white; font-size: 13px; outline: none; }
+.modal-field select { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid rgba(100,100,200,0.4); background: #1a1a3a; color: white; font-size: 13px; outline: none; cursor: pointer; }
+.modal-field select option { background: #1a1a3a; color: white; padding: 4px; }
+.modal-field select optgroup { background: #12122a; color: #aaa; font-weight: 700; }
+.modal-field input::placeholder { color: #666; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+/* 참가자 목록 확인용 */
+.roster-box {
+  background: rgba(170,195,230,0.55);
+  border: 1px solid rgba(255,255,255,0.55);
+  border-radius: 8px;
+}
+.roster-box-title {
+  font-size: 13px; font-weight: 700; color: #2a2a5a;
+  padding: 8px 14px 6px;
+}
+.roster-teams {
+  display: grid; grid-template-columns: 1fr 1fr;
+  padding: 0 14px 10px;
+}
+.roster-team-blue { border-right: 1px solid rgba(255,255,255,0.4); padding-right: 14px; }
+.roster-team-red  { padding-left: 14px; }
+.roster-team-header {
+  font-size: 12px; font-weight: 700; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.roster-team-header.blue { color: #2a5aaa; }
+.roster-team-header.red  { color: #aa2a2a; }
+.roster-team-header.blue::before { content:''; width:8px; height:8px; border-radius:50%; background:#4a7fe8; display:inline-block; }
+.roster-team-header.red::before  { content:''; width:8px; height:8px; border-radius:50%; background:#e84a4a; display:inline-block; }
+.roster-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.25);
+}
+.roster-row:last-child { border-bottom: none; }
+.roster-chzz  { font-size: 13px; color: #1a1a4a; font-weight: 600; }
+.roster-empty { font-size: 12px; color: rgba(0,0,0,0.25); font-style: italic; }
+
+/* 승패 기록 버튼 */
+.team-section-wrap { border-radius: 8px; overflow: hidden; }
+.mirror-teams { display: flex; gap: 12px; width: 100%; }
+.mirror-box {
+  flex: 1; min-width: 0;
+  background: rgba(30,30,60,0.85);
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.mirror-header {
+  padding: 10px 16px; font-size: 13px; font-weight: 700;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center;
+}
+.mirror-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-top: 1px solid rgba(255,255,255,0.07);
+}
+.mirror-empty { color: rgba(255,255,255,0.2); font-size: 12px; font-style: italic; }
+.trash-area {
+  grid-column: 1;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 6px;
+  border: 1px dashed rgba(255,255,255,0.2);
+  cursor: pointer; transition: all 0.2s;
+  color: rgba(255,255,255,0.3);
+}
+.trash-area:hover { border-color: rgba(232,74,74,0.6); color: #ff6a6a; background: rgba(232,74,74,0.1); }
+.trash-area.drag-over { border-color: #ff6a6a; background: rgba(232,74,74,0.25); color: #ff6a6a; transform: scale(1.1); }
+.trash-icon { width: 18px; height: 18px; pointer-events: none; }
+.record-btn-box {
+  display: grid;
+  grid-template-columns: 70px 1fr 50px 70px 1fr auto;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(30,30,60,0.85);
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.record-blue-area { grid-column: 2; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+.record-red-area  { grid-column: 5; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+.btn-win {
+  padding: 4px 16px; border-radius: 4px;
+  border: 1px solid rgba(74,127,232,0.45);
+  background: rgba(74,127,232,0.18); color: #6ab0ff;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap; font-family: inherit;
+}
+.btn-win:hover { background: rgba(74,127,232,0.38); border-color: rgba(74,127,232,0.7); }
+.btn-win:active { transform: scale(0.96); }
+.btn-lose {
+  padding: 4px 16px; border-radius: 4px;
+  border: 1px solid rgba(232,74,74,0.45);
+  background: rgba(232,74,74,0.18); color: #ff6a6a;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap; font-family: inherit;
+}
+.btn-lose:hover { background: rgba(232,74,74,0.38); border-color: rgba(232,74,74,0.7); }
+.btn-lose:active { transform: scale(0.96); }
+
+/* ───── FEARLESS DRAFT ───── */
+.fearless-wrap { display: flex; flex-direction: column; gap: 10px; }
+.fearless-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(170,195,230,0.55); border: 1px solid rgba(255,255,255,0.55);
+  border-radius: 8px; padding: 10px 16px; flex-wrap: wrap; gap: 10px;
+}
+.fearless-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fearless-game-label { font-size: 13px; color: #2a2a5a; font-weight: 600; }
+.fearless-game-num { font-size: 18px; font-weight: 900; color: #2a2a5a; }
+.fearless-desc { font-size: 12px; color: #4a4a8a; }
+.fearless-btns { display: flex; gap: 8px; }
+.fearless-game-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.fg-tab { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); background: rgba(30,30,60,0.6); color: #aaa; transition: all 0.15s; }
+.fg-tab.active { background: rgba(100,130,220,0.5); color: white; border-color: rgba(100,130,220,0.7); }
+.fg-tab.done { background: rgba(30,30,60,0.85); color: #6ab0ff; border-color: rgba(74,127,232,0.4); }
+.fg-tab.disabled { background: rgba(20,20,40,0.4); color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.08); cursor: default; }
+.fearless-draft-area { display: grid; grid-template-columns: 1fr 180px 1fr; gap: 10px; align-items: start; }
+.fd-team { background: rgba(30,30,60,0.85); border-radius: 8px; overflow: hidden; }
+.fd-team-header { padding: 10px 14px; font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.3); }
+.fd-section-label { font-size: 11px; color: #888; padding: 6px 14px 2px; font-weight: 600; letter-spacing: 1px; }
+.fd-bans  { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 14px 8px; min-height: 36px; }
+.fd-picks { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 14px 8px; min-height: 36px; }
+.fd-used-label { font-size: 11px; color: #e84a4a; padding: 6px 14px 2px; font-weight: 600; letter-spacing: 1px; }
+.fd-used  { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 14px 10px; min-height: 28px; }
+.fd-champ-tag { padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+.fd-champ-tag.pick-blue { background: rgba(74,127,232,0.25); color: #6ab0ff; border: 1px solid rgba(74,127,232,0.4); }
+.fd-champ-tag.pick-red  { background: rgba(232,74,74,0.25);  color: #ff6a6a; border: 1px solid rgba(232,74,74,0.4); }
+.fd-champ-tag.ban       { background: rgba(80,80,80,0.4); color: #aaa; border: 1px solid rgba(150,150,150,0.3); text-decoration: line-through; }
+.fd-champ-tag.used      { background: rgba(232,74,74,0.1); color: #ff6a6a; border: 1px solid rgba(232,74,74,0.25); opacity: 0.7; font-size: 11px; }
+.fd-remove { cursor: pointer; color: rgba(255,255,255,0.4); font-size: 11px; margin-left: 2px; }
+.fd-remove:hover { color: #ff6a6a; }
+.fd-center { background: rgba(30,30,60,0.85); border-radius: 8px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.fd-input-wrap { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.fd-input { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid rgba(100,100,200,0.4); background: rgba(255,255,255,0.08); color: white; font-size: 13px; outline: none; font-family: inherit; }
+.fd-input::placeholder { color: #666; }
+.fd-input-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.fd-action-btn { padding: 6px 4px; border-radius: 5px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s, transform 0.1s; }
+.fd-action-btn:hover { opacity: 0.85; }
+.fd-action-btn:active { transform: scale(0.96); }
+.fd-blue-btn { background: rgba(74,127,232,0.4); color: #a0c8ff; border: 1px solid rgba(74,127,232,0.5); }
+.fd-red-btn  { background: rgba(232,74,74,0.4);  color: #ffaaaa; border: 1px solid rgba(232,74,74,0.5); }
+.fd-ban-btn  { background: rgba(80,80,80,0.5); color: #ccc; border: 1px solid rgba(150,150,150,0.3); }
+.fd-vs { font-size: 20px; font-weight: 900; color: #555; }
+.fearless-game-label-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(170,195,230,0.35); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 700; color: #2a2a5a;
+}
+.fd-input-area {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  background: rgba(30,30,60,0.85); border-radius: 8px; padding: 12px 16px;
+}
+.fd-input-area .fd-input { flex: 1; min-width: 260px; }
+.fd-input-area .fd-input-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.fd-game-block {
+  background: rgba(30,30,60,0.85); border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.fd-game-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: rgba(0,0,0,0.3);
+  font-size: 13px; font-weight: 700; color: #ffe033;
+}
+.fd-game-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.fd-team-col { padding: 10px 16px; }
+.fd-team-col:first-child { border-right: 1px solid rgba(255,255,255,0.07); }
+
+/* ───── ROSTER ───── */
+.roster-table-wrap { background: rgba(30,30,60,0.88); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+.roster-table-header {
+  display: grid; grid-template-columns: 50px 1fr 90px 80px 80px 80px 120px;
+  background: rgba(0,0,0,0.3); font-size: 13px; font-weight: 700; color: #aaa;
+}
+.roster-table-header > div, .roster-r > div {
+  padding: 11px 0; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+}
+.roster-table-header > div:last-child, .roster-r > div:last-child { border-right: none; }
+.roster-r {
+  display: grid; grid-template-columns: 50px 1fr 90px 80px 80px 80px 120px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 13px; color: #ddd; align-items: center; transition: background 0.15s;
+}
+.roster-r:hover { background: rgba(255,255,255,0.04); }
+.roster-chzz-name { color: #00ffa3; font-weight: 700; }
+.roster-wins  { color: #6ab0ff; font-weight: 700; }
+.roster-loses { color: #ff6a6a; font-weight: 700; }
+.roster-rate  { color: #ffe033; font-weight: 700; }
+.roster-streak-win  { background: rgba(74,127,232,0.2); color: #6ab0ff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; border: 1px solid rgba(74,127,232,0.4); }
+.roster-streak-lose { background: rgba(232,74,74,0.2);  color: #ff6a6a; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; border: 1px solid rgba(232,74,74,0.4); }
+.roster-streak-none { color: rgba(255,255,255,0.2); font-size: 12px; }
+
+/* ───── RECORDS ───── */
+.rec-stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.rec-stat-card {
+  background: rgba(30,30,60,0.88); border-radius: 10px;
+  padding: 20px 16px; text-align: center;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.rec-stat-num { font-size: 32px; font-weight: 900; color: #ffe033; margin-bottom: 6px; }
+.rec-stat-label { font-size: 13px; color: #aaa; }
+.rec-table-wrap { background: rgba(30,30,60,0.88); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+.rec-table-header {
+  display: grid; grid-template-columns: 50px 110px 1fr 90px 1fr 90px 90px 90px;
+  background: rgba(0,0,0,0.3);
+  font-size: 13px; font-weight: 700; color: #aaa;
+}
+.rec-table-header > div, .rec-row > div {
+  padding: 11px 0; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+}
+.rec-table-header > div:last-child, .rec-row > div:last-child { border-right: none; }
+.rec-row {
+  display: grid; grid-template-columns: 50px 110px 1fr 90px 1fr 90px 90px 90px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 13px; color: #ddd; align-items: center;
+  transition: background 0.15s;
+}
+.rec-row:hover { background: rgba(255,255,255,0.04); }
+.rec-row .blue-win { color: #6ab0ff; font-weight: 700; }
+.rec-row .red-win  { color: #ff6a6a; font-weight: 700; }
+.rec-row .diff-num { color: #ccc; font-size: 12px; }
+.rec-num  { color: #666; }
+.rec-date { color: #888; font-size: 12px; }
+.rec-bpts { color: #6ab0ff; }
+.rec-rpts { color: #ff6a6a; }
+.rec-empty { padding: 40px; text-align: center; color: rgba(255,255,255,0.3); font-size: 14px; }
+.rec-del { cursor: pointer; color: rgba(255,255,255,0.2); font-size: 11px; margin-left: 4px; }
+.rec-del:hover { color: #ff6a6a; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="site-wrap">
+<nav class="navbar">
+  <div class="nav-item active" onclick="switchTab('match',this)">📋 내전 등록</div>
+  <div class="nav-item" onclick="switchTab('autoset',this)">AUTO SET</div>
+  <div class="nav-item" onclick="switchTab('fearless',this)">FEARLESS DRAFT</div>
+  <div class="nav-item" onclick="switchTab('records',this)">RECORDS</div>
+  <div class="nav-item" onclick="switchTab('roster',this)">ROSTER</div>
+  <div class="nav-item" onclick="switchTab('playerdb',this)">PLAYER DB</div>
+</nav>
+
+<!-- 내전 등록 -->
+<div id="tab-match" class="tab-content active">
+  <div class="main-content">
+    <div class="top-area">
+      <div class="filter-box">
+        <div class="filter-row1">
+          <span class="filter-label">팀 인원</span>
+          <select class="filter-select" id="teamSize" onchange="onTeamSizeChange()">
+            <option value="5">5 vs 5</option>
+            <option value="3">3 vs 3</option>
+            <option value="1">1 vs 1</option>
+          </select>
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="posCheck" checked/>주 포지션 고려
+          </label>
+          <button class="btn btn-auto" onclick="autoAssign()">자동 배정</button>
+          <button class="btn btn-random" onclick="randomShuffle()">랜덤</button>
+          <button class="btn btn-team" onclick="teamShuffle()">팀 셔플</button>
+          <div class="team-toggle">
+            <div class="t-blue" onclick="swapToBlue()">BLUE<br>TEAM</div>
+            <div class="t-red" onclick="swapToRed()">RED<br>TEAM</div>
+          </div>
+          <button class="btn btn-reset" onclick="resetParticipants()">참가자 초기화</button>
+        </div>
+        <div class="filter-row2">
+          <span class="count-text">참가 인원 <span id="countNow">0</span>/10 &nbsp; 평균 <span id="avgPts">0</span>pts</span>
+          <div class="search-wrap">
+            <input class="search-input" type="text" id="searchInput"
+              placeholder="빠른 추가..."
+              oninput="onSearchInput()"
+              onkeydown="onSearchKey(event)"
+              autocomplete="off"/>
+            <div class="search-dropdown" id="searchDropdown"></div>
+          </div>
+          <button class="btn btn-search" onclick="addPlayerManual()">추가</button>
+        </div>
+      </div>
+      <div class="banner">
+        <div class="banner-user-info">
+          <div class="banner-user-id" id="bannerUserId">LOLTCK01</div>
+          <div class="banner-user-role" id="bannerUserRole">관리자</div>
+        </div>
+        <img class="banner-logo" src="https://i.ibb.co/wh7hRJnQ/1.png" alt="로고"/>
+      </div>
+    </div>
+
+    <div class="vs-box">
+      <div class="vs-scores">
+        <div class="score-blue" id="blueScore">0<span class="pts">pts</span></div>
+        <div class="vs-center">
+          <div class="vs-label">V S</div>
+          <div class="vs-diff" id="vsDiff">점수 차이 없음</div>
+        </div>
+        <div class="score-red" id="redScore">0<span class="pts">pts</span></div>
+      </div>
+      <div class="vs-bar-wrap"><div class="vs-bar-fill" id="vsBar" style="width:50%"></div></div>
+      <div class="vs-stats">
+        <span class="blue-stat" id="blueStat">0%</span>
+        <span class="red-stat" id="redStat">0%</span>
+      </div>
+    </div>
+
+    <div class="team-section-wrap">
+    <div class="player-table-wrap" id="playerTableWrap">
+      <div class="table-header">
+        <div></div>
+        <div class="th-blue">BLUE TEAM</div>
+        <div class="th-vs">VS</div>
+        <div></div>
+        <div class="th-red">RED TEAM</div>
+      </div>
+      <div id="playerRows"></div>
+      <div class="total-row">
+        <div></div>
+        <div class="total-blue" id="blueTotal">0pts</div>
+        <div></div>
+        <div></div>
+        <div class="total-red" id="redTotal">0pts</div>
+      </div>
+    </div>
+
+    <!-- 휴지통만 -->
+    <div class="record-btn-box">
+      <div class="trash-area"
+        ondragover="onTrashOver(event)"
+        ondragleave="onTrashLeave(event)"
+        ondrop="onTrashDrop(event)"
+        id="trashZone"
+        title="여기에 드래그해서 삭제">
+        <svg class="trash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+      </div>
+      <div class="side-select-btn" onclick="openSideSelectGame()" title="진영 선택 게임">
+        🪙
+      </div>
+    </div>
+    </div><!-- /team-section-wrap -->
+
+    <!-- 참가자 목록 확인용 (독립 박스) -->
+    <div class="roster-box">
+      <div class="roster-box-title">참가자 목록 확인용 <span style="font-size:11px;font-weight:400;color:#4a4a8a;">(치지직 닉네임)</span></div>
+      <div class="roster-teams">
+        <div class="roster-team roster-team-blue" id="rosterBlue"></div>
+        <div class="roster-team roster-team-red"  id="rosterRed"></div>
+      </div>
+    </div>
+
+    <!-- 팀 박스 2 - 미러링, 분리 박스 -->
+    <div class="mirror-teams">
+      <div class="mirror-box mirror-blue">
+        <div class="mirror-header th-blue">BLUE TEAM <span class="avg-tier" id="mirrorBlueAvg" style="margin-left:auto;"></span></div>
+        <div id="mirrorBlue"></div>
+        <div class="mirror-btns">
+          <button class="btn-win"  onclick="recordResult('blue','win')">승리</button>
+          <button class="btn-lose" onclick="recordResult('blue','lose')">패배</button>
+        </div>
+      </div>
+      <div class="mirror-box mirror-red">
+        <div class="mirror-header th-red">RED TEAM <span class="avg-tier" id="mirrorRedAvg" style="margin-left:auto;"></span></div>
+        <div id="mirrorRed"></div>
+        <div class="mirror-btns">
+          <button class="btn-win"  onclick="recordResult('red','win')">승리</button>
+          <button class="btn-lose" onclick="recordResult('red','lose')">패배</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="tab-autoset" class="tab-content"><div style="padding:40px;text-align:center;color:#fff;font-size:18px;">AUTO SET 준비 중</div></div>
+<div id="tab-fearless" class="tab-content">
+  <div class="main-content">
+    <div class="fearless-wrap">
+
+      <!-- 상단 컨트롤 -->
+      <div class="fearless-controls">
+        <div class="fearless-info">
+          <span class="fearless-game-label">FEARLESS DRAFT</span>
+          <span class="fearless-desc">이전 경기에서 픽한 챔피언은 해당 팀이 다시 픽할 수 없습니다. (최대 5경기)</span>
+        </div>
+        <div class="fearless-btns">
+          <button class="btn btn-auto" onclick="fearlessNextGame()" id="fearlessNextBtn">다음 경기 →</button>
+          <button class="btn btn-reset" onclick="fearlessReset()">초기화</button>
+        </div>
+      </div>
+
+      <!-- 1~5경기 탭 -->
+      <div class="fearless-game-tabs" id="fearlessGameTabs"></div>
+
+      <!-- 1경기 레이블 -->
+      <div class="fearless-game-label-bar" id="fdGame0Label">
+        <span>1경기</span>
+      </div>
+
+      <!-- 입력 영역 -->
+      <div class="fearless-draft-area">
+        <!-- 블루팀 (빈칸 - 경기별 박스 컨테이너로 채워짐) -->
+        <div class="fd-team fd-blue" id="fdBlueCol">
+          <div class="fd-team-header th-blue">BLUE TEAM</div>
+          <div id="fdBlueContent"></div>
+        </div>
+
+        <!-- 가운데 입력 -->
+        <div class="fd-center">
+          <div class="fd-input-wrap">
+            <input class="fd-input" type="text" id="fdChampInput"
+              placeholder="챔피언, 챔피언, 챔피언..."
+              autocomplete="off"
+              onkeydown="if(event.key==='Enter')fdActionMulti('blue','pick')"/>
+            <div id="fdBtnArea">
+            <div class="fd-input-btns">
+              <button class="fd-action-btn fd-blue-btn" onclick="fdActionMulti('blue','pick')">블루 픽</button>
+              <button class="fd-action-btn fd-red-btn"  onclick="fdActionMulti('red','pick')">레드 픽</button>
+            </div>
+            <div class="fd-input-btns">
+              <button class="fd-action-btn fd-ban-btn"  onclick="fdActionMulti('blue','ban')">블루 밴</button>
+              <button class="fd-action-btn fd-ban-btn"  onclick="fdActionMulti('red','ban')">레드 밴</button>
+            </div>
+            <button class="btn btn-reset" style="width:100%;margin-top:6px;font-size:12px;" onclick="fdUndo()">↩ 입력 취소</button>
+            </div>
+          </div>
+          <div class="fd-vs">VS</div>
+        </div>
+
+        <!-- 레드팀 -->
+        <div class="fd-team fd-red" id="fdRedCol">
+          <div class="fd-team-header th-red">RED TEAM</div>
+          <div id="fdRedContent"></div>
+        </div>
+      </div>
+
+      <!-- 경기별 누적 박스 (2경기부터) -->
+      <div id="fearlessGamesContainer"></div>
+
+    </div>
+  </div>
+</div>
+<div id="tab-records" class="tab-content">
+  <div class="main-content">
+
+    <!-- 통계 카드 -->
+    <div class="rec-stats-row">
+      <div class="rec-stat-card">
+        <div class="rec-stat-num" id="recTotalGames">0</div>
+        <div class="rec-stat-label">총 게임 수</div>
+      </div>
+      <div class="rec-stat-card">
+        <div class="rec-stat-num" id="recBlueWins">0</div>
+        <div class="rec-stat-label">블루 승리</div>
+      </div>
+      <div class="rec-stat-card">
+        <div class="rec-stat-num" id="recRedWins">0</div>
+        <div class="rec-stat-label">레드 승리</div>
+      </div>
+      <div class="rec-stat-card">
+        <div class="rec-stat-num" id="recAvgDiff">0</div>
+        <div class="rec-stat-label">평균 차이</div>
+      </div>
+    </div>
+
+    <!-- 경기 기록 테이블 -->
+    <div class="rec-table-wrap">
+      <div class="rec-table-header">
+        <div>#</div>
+        <div>날짜</div>
+        <div>블루팀</div>
+        <div>차이</div>
+        <div>레드팀</div>
+        <div>승리</div>
+        <div>B pts</div>
+        <div>R pts</div>
+      </div>
+      <div id="recTableBody">
+        <div class="rec-empty">아직 기록된 경기가 없습니다.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div id="tab-roster" class="tab-content">
+  <div class="main-content">
+    <div class="roster-table-wrap">
+      <div class="roster-table-header">
+        <div>No.</div>
+        <div>치지직 닉네임</div>
+        <div>총 게임</div>
+        <div>승리</div>
+        <div>패배</div>
+        <div>승률</div>
+        <div>최근 경기폼</div>
+      </div>
+      <div id="rosterTableBody">
+        <div class="rec-empty">등록된 플레이어가 없습니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-playerdb" class="tab-content">
+  <div class="playerdb-wrap">
+    <div class="playerdb-add-box">
+      <input type="text" id="dbAddInput"
+        placeholder="치지직 닉네임 / 롤 닉네임#태그 / 티어 / 주 포지션 / 부 포지션(최대3개)"
+        onkeydown="if(event.key==='Enter')dbAddPlayer()"/>
+      <button class="btn btn-auto" onclick="dbAddPlayer()">추가</button>
+    </div>
+    <div class="playerdb-grid" id="playerdbGrid"></div>
+  </div>
+</div>
+
+<!-- 동전 뒤집기 게임 모달 -->
+<div class="modal-bg" id="coinGameModal">
+  <div class="modal-box coin-modal">
+    <h3>🪙 진영 선택 — 동전 뒤집기</h3>
+    <p class="coin-desc">앞면 또는 뒷면을 선택하고 동전을 던지세요!</p>
+    <div class="coin-wrap">
+      <div class="coin" id="coinEl">
+        <div class="coin-face coin-front">G</div>
+        <div class="coin-face coin-back">G</div>
+      </div>
+    </div>
+    <div class="coin-btns">
+      <button class="coin-choice-btn btn-heads" onclick="flipCoin('heads')">앞면 선택</button>
+      <button class="coin-choice-btn btn-tails" onclick="flipCoin('tails')">뒷면 선택</button>
+    </div>
+    <div class="coin-result" id="coinResult"></div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn btn-reset" onclick="resetCoinGame()">다시 하기</button>
+      <button class="btn btn-auto" onclick="closeCoinGame()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 수정 모달 -->
+<div class="modal-bg" id="editModal">
+  <div class="modal-box">
+    <h3>선수 정보 수정</h3>
+    <input type="hidden" id="editIdx"/>
+    <div class="modal-field"><label>치지직 닉네임</label><input type="text" id="editChzz"/></div>
+    <div class="modal-field"><label>롤 닉네임#태그</label><input type="text" id="editLol"/></div>
+    <div class="modal-field"><label>최고 티어</label>
+      <select id="editTier">
+        <optgroup label="브론즈"><option style="background:#8B5A2B;color:#f5d9b0;">브론즈 4</option><option style="background:#8B5A2B;color:#f5d9b0;">브론즈 3</option><option style="background:#8B5A2B;color:#f5d9b0;">브론즈 2</option><option style="background:#8B5A2B;color:#f5d9b0;">브론즈 1</option></optgroup>
+        <optgroup label="실버"><option style="background:#6b6b6b;color:#e0e0e0;">실버 4</option><option style="background:#6b6b6b;color:#e0e0e0;">실버 3</option><option style="background:#6b6b6b;color:#e0e0e0;">실버 2</option><option style="background:#6b6b6b;color:#e0e0e0;">실버 1</option></optgroup>
+        <optgroup label="골드"><option style="background:#7a6000;color:#ffd700;">골드 4</option><option style="background:#7a6000;color:#ffd700;">골드 3</option><option style="background:#7a6000;color:#ffd700;">골드 2</option><option style="background:#7a6000;color:#ffd700;">골드 1</option></optgroup>
+        <optgroup label="플레티넘"><option style="background:#0e7a6a;color:#60f0d0;">플레티넘 4</option><option style="background:#0e7a6a;color:#60f0d0;">플레티넘 3</option><option style="background:#0e7a6a;color:#60f0d0;">플레티넘 2</option><option style="background:#0e7a6a;color:#60f0d0;">플레티넘 1</option></optgroup>
+        <optgroup label="에메랄드"><option style="background:#1a7a3a;color:#60e890;">에메랄드 4</option><option style="background:#1a7a3a;color:#60e890;">에메랄드 3</option><option style="background:#1a7a3a;color:#60e890;">에메랄드 2</option><option style="background:#1a7a3a;color:#60e890;">에메랄드 1</option></optgroup>
+        <optgroup label="다이아몬드"><option style="background:#1a5aaa;color:#90c8ff;">다이아 4</option><option style="background:#1a5aaa;color:#90c8ff;">다이아 3</option><option style="background:#1a5aaa;color:#90c8ff;">다이아 2</option><option style="background:#1a5aaa;color:#90c8ff;">다이아 1</option></optgroup>
+        <optgroup label="마스터"><option style="background:#6a0080;color:#e080ff;">마스터 0LP</option><option style="background:#6a0080;color:#e080ff;">마스터 100LP</option><option style="background:#6a0080;color:#e080ff;">마스터 200LP</option><option style="background:#6a0080;color:#e080ff;">마스터 300LP</option><option style="background:#6a0080;color:#e080ff;">마스터 400LP</option><option style="background:#6a0080;color:#e080ff;">마스터 500LP</option><option style="background:#6a0080;color:#e080ff;">마스터 600LP</option><option style="background:#6a0080;color:#e080ff;">마스터 700LP</option><option style="background:#6a0080;color:#e080ff;">마스터 800LP</option><option style="background:#6a0080;color:#e080ff;">마스터 900LP</option><option style="background:#6a0080;color:#e080ff;">마스터 1000LP</option><option style="background:#6a0080;color:#e080ff;">마스터 1100LP</option></optgroup>
+        <optgroup label="그랜드마스터"><option style="background:#9a1a1a;color:#ffaaaa;">그랜드마스터 1200LP</option><option style="background:#9a1a1a;color:#ffaaaa;">그랜드마스터 1300LP</option><option style="background:#9a1a1a;color:#ffaaaa;">그랜드마스터 1400LP</option><option style="background:#9a1a1a;color:#ffaaaa;">그랜드마스터 1500LP</option><option style="background:#9a1a1a;color:#ffaaaa;">그랜드마스터 1600LP</option></optgroup>
+        <optgroup label="챌린저"><option style="background:#00aadd;color:#ffffff;">챌린저</option></optgroup>
+      </select>
+    </div>
+    <div class="modal-field"><label>주 포지션</label>
+      <select id="editMainPos">
+        <option value="0" style="background:#7b3a9e;color:white;">탑</option>
+        <option value="1" style="background:#2a7a3a;color:white;">정글</option>
+        <option value="2" style="background:#d4aa00;color:white;">미드</option>
+        <option value="3" style="background:#1a5aaa;color:white;">원딜</option>
+        <option value="4" style="background:#b03060;color:white;">서포터</option>
+        <option value="5" style="background:#ffffff;color:#222;">all</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>부 포지션 (콤마 구분, 최대 3개)</label><input type="text" id="editSubPos" placeholder="탑,정글"/></div>
+    <div class="modal-field"><label>특이사항</label><input type="text" id="editNote" placeholder="예: 노쇼 주의, 딜 부족 등"/></div>
+    <div class="modal-field">
+      <label>내전 경고</label>
+      <div style="display:flex;gap:12px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:white;font-size:13px;">
+          <input type="checkbox" id="editWarn1" style="width:16px;height:16px;accent-color:#f1c40f;"/>
+          <span style="color:#f1c40f;">경고 1</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:white;font-size:13px;">
+          <input type="checkbox" id="editWarn2" style="width:16px;height:16px;accent-color:#e74c3c;"/>
+          <span style="color:#e74c3c;">경고 2</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-reset" onclick="closeEditModal()">취소</button>
+      <button class="btn btn-auto" onclick="saveEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const POS_LIST  = ['탑','정글','미드','원딜','서포터','all'];
+const POS_CLASS = ['pos-top','pos-jungle','pos-mid','pos-bottom','pos-support','pos-all'];
+
+const TIER_PTS = {
+  '아이언':50,'브론즈':150,'실버':250,'골드':350,
+  '플래티넘':450,'플레티넘':450,'에메랄드':550,'다이아몬드':650,'다이아':650,
+  '마스터':800,'그랜드마스터':900,'챌린저':1000
+};
+function getTierPts(t) {
+  if (!t) return 0;
+  t = normalizeTier(t);
+  // 챌린저: 500~600
+  if (t.includes('챌린저')) return 500;
+  // 그랜드마스터: 420~500
+  if (t.includes('그랜드마스터')) {
+    const lp = (t.match(/(\d+)\s*LP/i)||[])[1];
+    if (!lp) return 420;
+    const lpVal = +lp;
+    if (lpVal >= 1600) return 500;
+    if (lpVal >= 1500) return 490;
+    if (lpVal >= 1400) return 480;
+    if (lpVal >= 1300) return 460;
+    return 420;
+  }
+  // 마스터: 350~420
+  if (t.includes('마스터')) {
+    const lp = (t.match(/(\d+)\s*LP/i)||[])[1];
+    if (!lp) return 350;
+    const lpVal = +lp;
+    const step = Math.floor(lpVal / 100);
+    return Math.min(350 + step * 7, 420);
+  }
+  // 다이아: 280~350 (4=280, 3=303, 2=327, 1=350)
+  if (t.includes('다이아')) {
+    const n = +(t.match(/\d/) || [4])[0];
+    return [0, 350, 327, 303, 280][n] || 280;
+  }
+  // 에메랄드: 230~280 (4=230, 3=243, 2=256, 1=280)
+  if (t.includes('에메')) {
+    const n = +(t.match(/\d/) || [4])[0];
+    return [0, 280, 256, 243, 230][n] || 230;
+  }
+  // 플레티넘: 190~230 (4=190, 3=203, 2=216, 1=230)
+  if (t.includes('플레') || t.includes('플래')) {
+    const n = +(t.match(/\d/) || [4])[0];
+    return [0, 230, 216, 203, 190][n] || 190;
+  }
+  // 골드: 150~190 (4=150, 3=163, 2=176, 1=190)
+  if (t.includes('골드')) {
+    const n = +(t.match(/\d/) || [4])[0];
+    return [0, 190, 176, 163, 150][n] || 150;
+  }
+  // 실버: 120~150 (4=120, 3=130, 2=140, 1=150)
+  if (t.includes('실버')) {
+    const n = +(t.match(/\d/) || [4])[0];
+    return [0, 150, 140, 130, 120][n] || 120;
+  }
+  // 브론즈: 100~120 (4=100, 3=106, 2=113, 1=120)
+  if (t.includes('브론즈')) {
+    const n = +(t.match(/\d/) || [4])[0];
+    return [0, 120, 113, 106, 100][n] || 100;
+  }
+  // 아이언
+  if (t.includes('아이언')) return 50;
+  return 0;
+}
+// 티어 정규화: "골드4" → "골드 4", "마스터100LP" → "마스터 100LP"
+function normalizeTier(t) {
+  if (!t) return t;
+  t = t.trim();
+  // LP 티어 (마스터/그랜드마스터): 숫자LP 앞 공백
+  t = t.replace(/([가-힣a-zA-Z])(\d+LP)/gi, '$1 $2');
+  // 일반 티어: 숫자 앞 공백
+  t = t.replace(/([가-힣])(\d)(?!LP)/g, '$1 $2');
+  return t;
+}
+
+function getTierClass(t) {
+  if (!t) return 'tier-d';
+  if (t.includes('그랜드마스터')) return 'tier-gm';
+  if (t.includes('챌린저'))       return 'tier-c';
+  if (t.includes('마스터'))       return 'tier-m';
+  if (t.includes('다이아'))       return 'tier-d';
+  if (t.includes('에메'))         return 'tier-e';
+  if (t.includes('플레')||t.includes('플래')) return 'tier-p';
+  if (t.includes('골드'))         return 'tier-g';
+  if (t.includes('실버'))         return 'tier-s';
+  if (t.includes('브론즈'))       return 'tier-b';
+  return 'tier-d';
+}
+function getPosIndex(s) {
+  const m = {'탑':0,'정글':1,'미드':2,'원딜':3,'바텀':3,'서포터':4,'서포트':4,'all':5,'ALL':5};
+  return m[s?.trim()] ?? 0;
+}
+
+// ─── 데이터 ───
+let playerDB = [
+  {chzz:'탁큐',     lol:'그냥그런놈#0203', tier:'플레티넘2',       mainPos:3, subPos:[0,1], wins:7,  loses:4, note:'', warnings:0},
+  {chzz:'고래왕',   lol:'지수나#0207',    tier:'다이아 2',        mainPos:0, subPos:[2],   wins:10, loses:3, note:'', warnings:0},
+  {chzz:'정글러킹', lol:'dabido#kr2',    tier:'골드 4',          mainPos:1, subPos:[4],   wins:6,  loses:7, note:'', warnings:0},
+  {chzz:'미드장인', lol:'살러주세요#010', tier:'플레티넘 2',       mainPos:2, subPos:[3],   wins:5,  loses:6, note:'', warnings:1},
+  {chzz:'원딜마스터',lol:'오기오기#KR03',tier:'마스터 100LP',     mainPos:3, subPos:[2],   wins:14, loses:2, note:'', warnings:0},
+  {chzz:'서폿신',   lol:'지병구#999',    tier:'에메랄드 4',       mainPos:4, subPos:[0],   wins:8,  loses:5, note:'', warnings:0},
+];
+
+// blueTeam/redTeam: { name, tier, pts, pos, dbIdx(-1=없음) }
+let blueTeam = [
+  {name:'지수나#0207',     tier:'다이아 2',      pts:327, pos:0, dbIdx:1},
+  {name:'dabido#kr2',     tier:'골드 4',        pts:150, pos:1, dbIdx:2},
+  {name:'살러주세요#010',  tier:'플레티넘 2',     pts:216, pos:2, dbIdx:3},
+  {name:'오기오기#KR03',  tier:'마스터 100LP',   pts:357, pos:3, dbIdx:4},
+  {name:'지병구#999',     tier:'에메랄드 4',      pts:230, pos:4, dbIdx:5},
+];
+let redTeam = [
+  {name:'Akaps#KR992',     tier:'다이아 4',      pts:280, pos:0, dbIdx:-1},
+  {name:'귀공주님#0203',   tier:'플레티넘 2',     pts:216, pos:1, dbIdx:-1},
+  {name:'플라워가든#달빛', tier:'플레티넘 4',      pts:190, pos:2, dbIdx:-1},
+  {name:'나쁜선글#kr1',   tier:'다이아 3',        pts:303, pos:3, dbIdx:-1},
+  {name:'야기고양이#0713', tier:'다이아 4',       pts:280, pos:4, dbIdx:-1},
+];
+
+// ─── 드래그 상태 ───
+let dragState = null; // { team:'blue'|'red', idx:number }
+let dragState2 = null;
+
+// 팀 박스 2 데이터
+let blueTeam2 = [];
+let redTeam2  = [];
+
+// ─── 포지션 팝업 상태 ───
+let openPopup = null; // { team, idx, el }
+
+// ─── 자동배정 ───
+function autoAssign() {
+  const all = [...blueTeam, ...redTeam];
+  all.sort((a,b) => b.pts - a.pts);
+  blueTeam = []; redTeam = [];
+  all.forEach((p,i) => {
+    const round = Math.floor(i/2);
+    const toBlue = round%2===0 ? i%2===0 : i%2===1;
+    const t = toBlue ? blueTeam : redTeam;
+    t.push({...p, pos: t.length});
+  });
+  renderTable();
+}
+
+// ─── 랜덤 배정 ───
+function randomShuffle() {
+  const all = [...blueTeam,...redTeam];
+  for (let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
+  const posCheck = document.getElementById('posCheck').checked;
+  if (posCheck) {
+    blueTeam=[]; redTeam=[];
+    const byPos=[[],[],[],[],[]];
+    all.forEach(p=>byPos[p.pos%5].push(p));
+    byPos.forEach((players,pi)=>players.forEach((p,i)=>{
+      const player={...p,pos:pi};
+      (i%2===0?blueTeam:redTeam).push(player);
+    }));
+  } else {
+    const half=Math.ceil(all.length/2);
+    blueTeam=all.slice(0,half).map((p,i)=>({...p,pos:i%5}));
+    redTeam=all.slice(half).map((p,i)=>({...p,pos:i%5}));
+  }
+  renderTable();
+}
+
+// ─── 팀 셔플 ───
+function teamShuffle() {
+  function sp(team){
+    const pos=team.map(p=>p.pos);
+    for(let i=pos.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pos[i],pos[j]]=[pos[j],pos[i]];}
+    return team.map((p,i)=>({...p,pos:pos[i]}));
+  }
+  blueTeam=sp(blueTeam); redTeam=sp(redTeam);
+  renderTable();
+}
+
+function onTeamSizeChange() {
+  const size = parseInt(document.getElementById('teamSize').value);
+  // 팀 인원 초과분 제거
+  blueTeam = blueTeam.filter(p=>p).slice(0, size);
+  redTeam  = redTeam.filter(p=>p).slice(0, size);
+  renderTable();
+}
+
+function resetParticipants(){if(confirm('참가자를 모두 초기화할까요?')){blueTeam=[];redTeam=[];renderTable();}}
+function filterTeam(t){alert(t.toUpperCase()+' TEAM 필터');}
+
+// ─── 팀 교체 ───
+function swapToBlue() {
+  // 레드팀 인원을 블루팀으로 이동 (블루팀 자리에 레드팀 배치)
+  const temp = [...blueTeam];
+  blueTeam = [...redTeam];
+  redTeam = [...temp];
+  renderTable();
+}
+function swapToRed() {
+  // 블루팀 인원을 레드팀으로 이동 (레드팀 자리에 블루팀 배치)
+  const temp = [...redTeam];
+  redTeam = [...blueTeam];
+  blueTeam = [...temp];
+  renderTable();
+}
+
+// ─── 검색 자동완성 ───
+function onSearchInput(){
+  const val = document.getElementById('searchInput').value.trim().toLowerCase();
+  const dd  = document.getElementById('searchDropdown');
+  if (!val) { dd.classList.remove('show'); return; }
+
+  const res = playerDB.filter(p =>
+    p.chzz.toLowerCase().includes(val) || p.lol.toLowerCase().includes(val)
+  );
+  if (!res.length) {
+    dd.innerHTML = '<div class="search-item" style="color:#aaa;cursor:default;">검색 결과 없음</div>';
+    dd.classList.add('show');
+    return;
+  }
+
+  // 키보드 선택용 인덱스 저장
+  window._searchResults = res.map(p => playerDB.indexOf(p));
+
+  dd.innerHTML = res.map(p => {
+    const idx = playerDB.indexOf(p);
+    return `<div class="search-item" onclick="selectPlayer(${idx})">
+      <div class="s-nick">${p.chzz} / ${p.lol}</div>
+      <div class="s-detail">${p.tier} · 주: ${POS_LIST[p.mainPos]} · 부: ${p.subPos.map(i=>POS_LIST[i]).join(', ')}</div>
+    </div>`;
+  }).join('');
+  dd.classList.add('show');
+}
+
+function onSearchKey(e){
+  if (e.key === 'Escape') {
+    document.getElementById('searchDropdown').classList.remove('show');
+    return;
+  }
+  if (e.key === 'Enter') {
+    // 검색 결과 첫 번째 플레이어 자동 선택
+    const results = window._searchResults;
+    if (results && results.length > 0) {
+      selectPlayer(results[0]);
+    } else {
+      // DB에 없으면 알림
+      const val = document.getElementById('searchInput').value.trim();
+      if (val) alert('등록된 플레이어가 없습니다.\nPLAYER DB에 먼저 등록해주세요.');
+    }
+  }
+}
+
+function selectPlayer(idx){
+  const p = playerDB[idx];
+  if (!p) return;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchDropdown').classList.remove('show');
+  window._searchResults = [];
+
+  // 이미 팀에 있는지 확인
+  const already = [...blueTeam, ...redTeam].filter(t=>t).some(t => t.dbIdx === idx);
+  if (already) { alert(`"${p.chzz}"은(는) 이미 팀에 있어요!`); return; }
+
+  const pts = getTierPts(p.tier);
+  const player = { name: p.lol, tier: p.tier, pts, pos: p.mainPos, dbIdx: idx };
+
+  if (blueTeam.filter(t=>t).length <= redTeam.filter(t=>t).length && blueTeam.filter(t=>t).length < 5)
+    blueTeam.push(player);
+  else if (redTeam.filter(t=>t).length < 5)
+    redTeam.push(player);
+  else { alert('팀이 가득 찼어요! (각 팀 최대 5명)'); return; }
+
+  renderTable();
+}
+
+function addPlayerManual(){
+  // 추가 버튼 클릭 시 → 검색창 첫 결과 선택
+  const results = window._searchResults;
+  if (results && results.length > 0) {
+    selectPlayer(results[0]);
+  } else {
+    const val = document.getElementById('searchInput').value.trim();
+    if (val) alert('등록된 플레이어가 없습니다.\nPLAYER DB에 먼저 등록해주세요.');
+  }
+}
+
+// ─── 포지션 팝업 ───
+function togglePosPopup(e, team, idx, elId) {
+  e.stopPropagation();
+  const el = document.getElementById(elId);
+  // 같은 팝업 이미 열려있으면 닫기
+  if (openPopup && openPopup.elId === elId) { closeAllPopups(); return; }
+  closeAllPopups();
+
+  const player = team==='blue' ? blueTeam[idx] : redTeam[idx];
+  const db = (player.dbIdx >= 0) ? playerDB[player.dbIdx] : null;
+
+  let posList = [];
+  if (db) {
+    posList.push({pos: db.mainPos, label:'주 포지션', isMain:true});
+    db.subPos.forEach(p => posList.push({pos:p, label:'부 포지션', isMain:false}));
+  } else {
+    POS_LIST.forEach((n,i) => posList.push({pos:i, label:n, isMain: i===player.pos}));
+  }
+
+  const popup = document.createElement('div');
+  popup.className = 'pos-popup show';
+  popup.innerHTML = `<div class="pos-popup-title">포지션 변경</div>` +
+    posList.map(item => `
+      <div class="pos-popup-item ${item.isMain?'is-main':''}"
+        onclick="changePos(event,'${team}',${idx},${item.pos})">
+        <span class="pos-badge ${POS_CLASS[item.pos]}">${POS_LIST[item.pos]}</span>
+        <span class="pp-label">${item.label}</span>
+      </div>`).join('');
+
+  popup.addEventListener('click', e => e.stopPropagation());
+  el.appendChild(popup);
+  openPopup = { team, idx, el, elId, popup };
+}
+
+function openPosPopup(team, idx, el) {}
+
+function closeAllPopups() {
+  if (openPopup) {
+    openPopup.popup.remove();
+    openPopup = null;
+  }
+}
+
+function changePos(e, team, idx, newPos) {
+  e.stopPropagation();
+  if (team==='blue') blueTeam[idx].pos = newPos;
+  else redTeam[idx].pos = newPos;
+  closeAllPopups();
+  renderTable();
+}
+
+// ─── 드래그 앤 드롭 ───
+function onDragStart(e, team, idx) {
+  dragState = {team, idx};
+  e.dataTransfer.setData('text/plain', team + ':' + idx);
+  e.dataTransfer.effectAllowed = 'move';
+  const cell = e.currentTarget.closest('.drag-cell');
+  if (cell) setTimeout(() => cell.classList.add('dragging'), 0);
+}
+function onDragEnd(e) {
+  document.querySelectorAll('.drag-cell').forEach(c => {
+    c.classList.remove('drag-over', 'dragging');
+  });
+  dragState = null;
+}
+function onDragOver(e, team, idx) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!dragState) return;
+  // 같은 셀이면 스킵
+  if (dragState.team === team && dragState.idx === idx) return;
+  document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave(e) {
+  // relatedTarget이 현재 셀 내부면 무시 (자식 요소로 이동)
+  const cell = e.currentTarget;
+  const related = e.relatedTarget;
+  if (related && cell.contains(related)) return;
+  cell.classList.remove('drag-over');
+}
+function onDrop(e, toTeam, toIdx) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  let fromTeam, fromIdx;
+  if (dragState) {
+    fromTeam = dragState.team;
+    fromIdx  = dragState.idx;
+  } else {
+    const raw = e.dataTransfer.getData('text/plain');
+    if (!raw || !raw.includes(':')) return;
+    [fromTeam, fromIdx] = raw.split(':');
+    fromIdx = parseInt(fromIdx);
+  }
+  dragState = null;
+  document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over','dragging'));
+
+  // 같은 자리면 무시
+  if (fromTeam === toTeam && fromIdx === toIdx) return;
+
+  const fromArr = fromTeam === 'blue' ? blueTeam : redTeam;
+  const toArr   = toTeam   === 'blue' ? blueTeam : redTeam;
+
+  const fromPlayer = fromArr[fromIdx] ? {...fromArr[fromIdx]} : null;
+  const toPlayer   = toArr[toIdx]     ? {...toArr[toIdx]}     : null;
+
+  if (!fromPlayer) return; // 빈 슬롯에서 드래그 시도 무시
+
+  // from 슬롯에 to 내용 넣기 (교환 또는 비우기)
+  if (toPlayer) {
+    fromArr[fromIdx] = toPlayer;
+  } else {
+    delete fromArr[fromIdx];
+    fromArr[fromIdx] = undefined;
+  }
+
+  // to 슬롯에 from 내용 넣기
+  toArr[toIdx] = fromPlayer;
+
+  // undefined 정리 (배열 구멍 제거하되 5슬롯 유지)
+  // blueTeam/redTeam을 최대 5 길이로 유지하면서 undefined 제거
+  function cleanArr(arr) {
+    const filled = arr.filter(p => p !== undefined && p !== null);
+    return filled;
+  }
+
+  // 팀 간 이동이면 배열 정리
+  if (fromTeam !== toTeam) {
+    if (fromTeam === 'blue') blueTeam = cleanArr(blueTeam);
+    else redTeam = cleanArr(redTeam);
+  }
+
+  renderTable();
+}
+
+// ─── 테이블 렌더 ───
+function renderTable() {
+  closeAllPopups();
+  const tbody = document.getElementById('playerRows');
+  let html = '';
+  const size = parseInt(document.getElementById('teamSize')?.value || 5);
+  const rows = size;
+
+  for (let i = 0; i < rows; i++) {
+    const b = blueTeam[i];
+    const r = redTeam[i];
+    const bpos = b ? b.pos : i;
+    const rpos = r ? r.pos : i;
+
+    html += `<div class="player-row">`;
+
+    // 블루 포지션 배지
+    html += `<div><span class="pos-badge ${POS_CLASS[bpos]}">${POS_LIST[bpos]}</span></div>`;
+
+    // 블루 슬롯 (항상 드롭존)
+    html += `<div class="drag-cell drag-cell-blue" id="bslot-${i}"
+      ondragover="onDragOver(event,'blue',${i})"
+      ondragleave="onDragLeave(event)"
+      ondrop="onDrop(event,'blue',${i})">`;
+    if (b) {
+      html += `<span class="drag-handle" draggable="true"
+        ondragstart="onDragStart(event,'blue',${i})"
+        ondragend="onDragEnd(event)">⠿</span>
+        <span class="player-name" onclick="togglePosPopup(event,'blue',${i},'bslot-${i}')">${b.name}</span>
+        <span class="tier-badge ${getTierClass(b.tier)}">${b.tier}</span>
+        <span class="player-pts">${b.pts} pts</span>`;
+    }
+    html += `</div>`;
+
+    html += `<div class="vs-cell">VS</div>`;
+
+    // 레드 포지션 배지
+    html += `<div><span class="pos-badge ${POS_CLASS[rpos]}">${POS_LIST[rpos]}</span></div>`;
+
+    // 레드 슬롯 (항상 드롭존)
+    html += `<div class="drag-cell drag-cell-red" id="rslot-${i}"
+      ondragover="onDragOver(event,'red',${i})"
+      ondragleave="onDragLeave(event)"
+      ondrop="onDrop(event,'red',${i})">`;
+    if (r) {
+      html += `<span class="drag-handle" draggable="true"
+        ondragstart="onDragStart(event,'red',${i})"
+        ondragend="onDragEnd(event)">⠿</span>
+        <span class="player-name" onclick="togglePosPopup(event,'red',${i},'rslot-${i}')">${r.name}</span>
+        <span class="tier-badge ${getTierClass(r.tier)}">${r.tier}</span>
+        <span class="player-pts">${r.pts} pts</span>`;
+    }
+    html += `</div>`;
+
+    html += `</div>`;
+  }
+  tbody.innerHTML = html;
+  updateScores();
+  renderRoster();
+  renderMirror();
+}
+
+function updateScores() {
+  const bT=blueTeam.reduce((s,p)=>s+p.pts,0);
+  const rT=redTeam.reduce((s,p)=>s+p.pts,0);
+  const tot=bT+rT||1;
+  const bP=((bT/tot)*100).toFixed(1);
+  const rP=((rT/tot)*100).toFixed(1);
+  document.getElementById('blueScore').innerHTML=`${bT}<span class="pts">pts</span>`;
+  document.getElementById('redScore').innerHTML=`${rT}<span class="pts">pts</span>`;
+  document.getElementById('vsDiff').textContent=`${Math.abs(bT-rT)}pts 차이`;
+  const vsBarEl = document.getElementById('vsBar');
+  vsBarEl.style.width = bP + '%';
+  // fill은 파란색, 오른쪽 끝만 그라데이션으로 자연스럽게 이어지게
+  vsBarEl.style.background = `linear-gradient(90deg, #4a7fe8 0%, #7ab0ff 70%, #b060c0 90%, #e84a4a 100%)`;
+  document.getElementById('blueStat').textContent=`${bP}%`;
+  document.getElementById('redStat').textContent=`${rP}%`;
+  document.getElementById('blueTotal').textContent=bT+'pts';
+  document.getElementById('redTotal').textContent=rT+'pts';
+
+  // 평균 티어 계산
+  const blueAvg = document.getElementById('blueAvgTier');
+  const redAvg  = document.getElementById('redAvgTier');
+  if (blueAvg) blueAvg.textContent = blueTeam.length ? '평균 ' + getAvgTierLabel(blueTeam) : '';
+  if (redAvg)  redAvg.textContent  = redTeam.length  ? '평균 ' + getAvgTierLabel(redTeam)  : '';
+  const all=[...blueTeam,...redTeam];
+  document.getElementById('countNow').textContent=all.length;
+  document.getElementById('avgPts').textContent=all.length?Math.round(all.reduce((s,p)=>s+p.pts,0)/all.length):0;
+}
+
+// ─── PLAYER DB ───
+function renderPlayerDB() {
+  const grid = document.getElementById('playerdbGrid');
+  if (!playerDB.length) {
+    grid.innerHTML = '<div class="pc-no-player">등록된 선수가 없습니다.</div>';
+    return;
+  }
+  grid.innerHTML = playerDB.map((p, i) => {
+    const tot  = p.wins + p.loses;
+    const rate = tot > 0 ? Math.round((p.wins / tot) * 100) : 0;
+    const tc   = getTierClass(p.tier);
+    const subBadges = p.subPos.map(s =>
+      `<span class="pos-badge ${POS_CLASS[s]}" style="opacity:0.65;font-size:11px;padding:2px 7px;">${POS_LIST[s]}</span>`
+    ).join('');
+    return `
+    <div class="player-card">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        ${warningDot(p.warnings)}
+      </div>
+      <div class="pc-names">
+        <div class="pc-name">${p.chzz}</div>
+        <div class="pc-lol">${p.lol}</div>
+      </div>
+      <div class="pc-tier-wrap">
+        <span class="tier-badge ${tc}">${p.tier}</span>
+      </div>
+      <div class="pc-divider"></div>
+      <div class="pc-pos">
+        <span class="pos-badge ${POS_CLASS[p.mainPos]}" style="font-size:11px;padding:2px 7px;">${POS_LIST[p.mainPos]}</span>
+        ${subBadges}
+      </div>
+      ${p.note ? `<div class="pc-note" title="${p.note}">📌 ${p.note}</div>` : ''}
+      <div style="flex:1;"></div>
+
+      <div class="pc-actions">
+        <button class="btn btn-edit" onclick="openEditModal(${i})">수정</button>
+        <button class="btn btn-del" onclick="deletePlayer(${i})">삭제</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// PLAYER DB 탭 직접 추가
+function dbAddPlayer() {
+  const input = document.getElementById('dbAddInput');
+  const raw = input.value.trim();
+  if (!raw) return;
+  const parts = raw.split('/').map(s => s.trim());
+  if (parts.length < 4) {
+    alert('입력 양식:\n치지직닉 / 롤닉#태그 / 티어 / 주포지션 / 부포지션');
+    return;
+  }
+  const [chzz, lol, rawTier, mainPosStr, ...subRaw] = parts;
+  const tier = normalizeTier(rawTier);
+  const subStr = subRaw.join('/');
+  if (!lol.includes('#')) {
+    alert('롤 닉네임은 닉네임#태그 형식으로 입력해주세요.');
+    return;
+  }
+  const mainPos = getPosIndex(mainPosStr);
+  const subPos  = subStr ? subStr.split(',').map(s => getPosIndex(s.trim())).slice(0, 3) : [];
+  const exists  = playerDB.findIndex(p => p.lol.toLowerCase() === lol.toLowerCase());
+  if (exists !== -1) { alert('이미 등록된 선수예요.'); return; }
+  playerDB.push({ chzz, lol, tier, mainPos, subPos, wins: 0, loses: 0, note: '', warnings: 0 });
+  renderPlayerDB();
+  input.value = '';
+}
+
+function openEditModal(idx) {
+  const p=playerDB[idx];
+  document.getElementById('editIdx').value=idx;
+  document.getElementById('editChzz').value=p.chzz;
+  document.getElementById('editLol').value=p.lol;
+  document.getElementById('editTier').value=p.tier;
+  document.getElementById('editMainPos').value=p.mainPos;
+  document.getElementById('editSubPos').value=p.subPos.map(i=>POS_LIST[i]).join(',');
+  document.getElementById('editNote').value=p.note||'';
+  document.getElementById('editWarn1').checked = (p.warnings||0) >= 1;
+  document.getElementById('editWarn2').checked = (p.warnings||0) >= 2;
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEditModal(){document.getElementById('editModal').classList.remove('show');}
+function saveEdit(){
+  const idx=+document.getElementById('editIdx').value;
+  const subStr=document.getElementById('editSubPos').value;
+  playerDB[idx]={
+    chzz: document.getElementById('editChzz').value.trim(),
+    lol:  document.getElementById('editLol').value.trim(),
+    tier: document.getElementById('editTier').value.trim(),
+    mainPos: +document.getElementById('editMainPos').value,
+    subPos: subStr?subStr.split(',').map(s=>getPosIndex(s.trim())).slice(0,3):[],
+    wins: playerDB[idx].wins,
+    loses: playerDB[idx].loses,
+    note: document.getElementById('editNote').value.trim(),
+    warnings: (document.getElementById('editWarn1').checked ? 1 : 0) + (document.getElementById('editWarn2').checked ? 1 : 0),
+  };
+  closeEditModal();
+  renderPlayerDB();
+}
+function deletePlayer(idx){
+  if(!confirm(`"${playerDB[idx].chzz}" 선수를 삭제할까요?`))return;
+  playerDB.splice(idx,1);
+  renderPlayerDB();
+}
+
+// ─── 휴지통 드롭 ───
+function onTrashOver(e) {
+  e.preventDefault();
+  if (!dragState) return;
+  document.getElementById('trashZone').classList.add('drag-over');
+}
+function onTrashLeave(e) {
+  document.getElementById('trashZone').classList.remove('drag-over');
+}
+function onTrashDrop(e) {
+  e.preventDefault();
+  document.getElementById('trashZone').classList.remove('drag-over');
+
+  let fromTeam, fromIdx;
+  if (dragState) {
+    fromTeam = dragState.team;
+    fromIdx  = dragState.idx;
+  } else {
+    const raw = e.dataTransfer.getData('text/plain');
+    if (!raw || !raw.includes(':')) return;
+    [fromTeam, fromIdx] = raw.split(':');
+    fromIdx = parseInt(fromIdx);
+  }
+  dragState = null;
+
+  const arr = fromTeam === 'blue' ? blueTeam : redTeam;
+  if (arr[fromIdx] !== undefined) {
+    arr[fromIdx] = undefined;
+    if (fromTeam === 'blue') blueTeam = blueTeam.filter(p => p !== undefined);
+    else redTeam = redTeam.filter(p => p !== undefined);
+  }
+  renderTable();
+}
+
+// ─── 경고 표시등 ───
+function warningDot(warnings) {
+  const w = warnings || 0;
+  const color = w === 0 ? '#2ecc71' : w === 1 ? '#f1c40f' : '#e74c3c';
+  const title = w === 0 ? '경고 없음' : w === 1 ? '경고 1개' : '경고 2개 이상';
+  return `<span class="warn-dot" style="background:${color};" title="${title}"></span>`;
+}
+
+// ─── 평균 티어 계산 ───
+function getAvgTierLabel(team) {
+  if (!team.length) return '';
+  const avg = Math.round(team.reduce((s,p) => s + p.pts, 0) / team.length);
+  const tiers = [
+    [100,'브론즈 4'],[106,'브론즈 3'],[113,'브론즈 2'],[120,'브론즈 1'],
+    [120,'실버 4'],[130,'실버 3'],[140,'실버 2'],[150,'실버 1'],
+    [150,'골드 4'],[163,'골드 3'],[176,'골드 2'],[190,'골드 1'],
+    [190,'플레티넘 4'],[203,'플레티넘 3'],[216,'플레티넘 2'],[230,'플레티넘 1'],
+    [230,'에메랄드 4'],[243,'에메랄드 3'],[256,'에메랄드 2'],[280,'에메랄드 1'],
+    [280,'다이아 4'],[303,'다이아 3'],[327,'다이아 2'],[350,'다이아 1'],
+    [350,'마스터'],[420,'그랜드마스터'],[500,'챌린저']
+  ];
+  let label = '브론즈 4';
+  for (const [pts, name] of tiers) {
+    if (avg >= pts) label = name;
+  }
+  return label;
+}
+
+// ═══════════════════════════════
+// ROSTER TAB
+// ═══════════════════════════════
+function getStreakInfo(chzz) {
+  // matchRecords에서 해당 치지직 닉네임이 포함된 경기만 필터링
+  const games = matchRecords.filter(r =>
+    r.blueNames.includes(chzz) || r.redNames.includes(chzz)
+  );
+  if (!games.length) return { streak: 0, type: 'none' };
+
+  // 가장 최근 경기부터 연속 체크
+  let streak = 0;
+  let streakType = 'none';
+
+  for (let i = 0; i < games.length; i++) {
+    const rec = games[i];
+    const inBlue = rec.blueNames.includes(chzz);
+    const won = (inBlue && rec.winner === 'blue') || (!inBlue && rec.winner === 'red');
+    const type = won ? 'win' : 'lose';
+
+    if (i === 0) { streakType = type; streak = 1; }
+    else if (type === streakType) streak++;
+    else break;
+  }
+
+  return { streak, type: streakType };
+}
+
+function renderRosterTab() {
+  const body = document.getElementById('rosterTableBody');
+  if (!body) return;
+  if (!playerDB.length) {
+    body.innerHTML = '<div class="rec-empty">등록된 플레이어가 없습니다.</div>';
+    return;
+  }
+
+  // 승률 내림차순 정렬
+  const sorted = [...playerDB].map((p, origIdx) => ({...p, origIdx}))
+    .sort((a, b) => {
+      const rateA = (a.wins + a.loses) ? a.wins / (a.wins + a.loses) : 0;
+      const rateB = (b.wins + b.loses) ? b.wins / (b.wins + b.loses) : 0;
+      return rateB - rateA;
+    });
+
+  body.innerHTML = sorted.map((p, i) => {
+    const total = p.wins + p.loses;
+    const rate  = total ? Math.round((p.wins / total) * 100) : 0;
+    const { streak, type } = getStreakInfo(p.chzz);
+
+    let streakHtml = '<span class="roster-streak-none">-</span>';
+    if (streak >= 2) {
+      if (type === 'win')  streakHtml = `<span class="roster-streak-win">🔥 ${streak}연승</span>`;
+      if (type === 'lose') streakHtml = `<span class="roster-streak-lose">❄️ ${streak}연패</span>`;
+    }
+
+    return `<div class="roster-r">
+      <div>${i + 1}</div>
+      <div><span class="roster-chzz-name">${p.chzz}</span></div>
+      <div>${total}</div>
+      <div class="roster-wins">${p.wins}</div>
+      <div class="roster-loses">${p.loses}</div>
+      <div class="roster-rate">${rate}%</div>
+      <div>${streakHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════
+// RECORDS
+// ═══════════════════════════════
+let matchRecords = [
+  { date:'2026.04.19', blueNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], redNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], bluePts:1560, redPts:1480, winner:'blue' },
+  { date:'2026.04.19', blueNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], redNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], bluePts:1420, redPts:1510, winner:'red' },
+  { date:'2026.04.18', blueNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], redNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], bluePts:1390, redPts:1550, winner:'red' },
+  { date:'2026.04.18', blueNames:['고래왕','정글러킹','미드장인','원딜마스터','서폿신'], redNames:['탁큐','고래왕2','고래왕3','고래왕4','고래왕5'], bluePts:1600, redPts:1400, winner:'blue' },
+]; // { date, blueNames, redNames, bluePts, redPts, winner }
+
+function addMatchRecord(winner) {
+  const now = new Date();
+  const date = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+  const bluePts = blueTeam.filter(p=>p).reduce((s,p)=>s+p.pts,0);
+  const redPts  = redTeam.filter(p=>p).reduce((s,p)=>s+p.pts,0);
+  const blueNames = blueTeam.filter(p=>p).map(p=>{
+    const db = p.dbIdx>=0?playerDB[p.dbIdx]:null;
+    return db?db.chzz:p.name;
+  });
+  const redNames = redTeam.filter(p=>p).map(p=>{
+    const db = p.dbIdx>=0?playerDB[p.dbIdx]:null;
+    return db?db.chzz:p.name;
+  });
+  matchRecords.unshift({ date, blueNames, redNames, bluePts, redPts, winner });
+  renderRecords();
+}
+
+function deleteRecord(idx) {
+  if (!confirm('이 경기 기록을 삭제할까요?')) return;
+  matchRecords.splice(idx, 1);
+  renderRecords();
+}
+
+function renderRecords() {
+  const total = matchRecords.length;
+  const blueW = matchRecords.filter(r=>r.winner==='blue').length;
+  const redW  = matchRecords.filter(r=>r.winner==='red').length;
+  const avgDiff = total ? Math.round(matchRecords.reduce((s,r)=>s+Math.abs(r.bluePts-r.redPts),0)/total) : 0;
+
+  const tg = document.getElementById('recTotalGames');
+  const bw = document.getElementById('recBlueWins');
+  const rw = document.getElementById('recRedWins');
+  const ad = document.getElementById('recAvgDiff');
+  if (tg) tg.textContent = total;
+  if (bw) bw.textContent = blueW;
+  if (rw) rw.textContent = redW;
+  if (ad) ad.textContent = avgDiff;
+
+  const body = document.getElementById('recTableBody');
+  if (!body) return;
+  if (!total) {
+    body.innerHTML = '<div class="rec-empty">아직 기록된 경기가 없습니다.</div>';
+    return;
+  }
+  body.innerHTML = matchRecords.map((r, i) => {
+    const diff = Math.abs(r.bluePts - r.redPts);
+    const winLabel = r.winner === 'blue'
+      ? '<span class="blue-win">🔵 블루</span>'
+      : '<span class="red-win">🔴 레드</span>';
+    return `<div class="rec-row">
+      <div class="rec-num">${total - i}</div>
+      <div class="rec-date">${r.date}</div>
+      <div>${r.blueNames.join(', ') || '-'}</div>
+      <div class="diff-num">${diff} pts</div>
+      <div>${r.redNames.join(', ') || '-'}</div>
+      <div>${winLabel}</div>
+      <div class="rec-bpts">${r.bluePts}</div>
+      <div class="rec-rpts">${r.redPts} <span class="rec-del" onclick="deleteRecord(${i})">✕</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════
+// FEARLESS DRAFT
+// ═══════════════════════════════
+const MAX_GAMES = 5;
+let fdGames = [{ blue: { picks: [], bans: [] }, red: { picks: [], bans: [] } }];
+let fdActiveGames = 1; // 현재 생성된 경기 수
+let lastFdCount = 0;   // 1경기 마지막 입력 개수
+let lastFdCountG = {}; // n경기 마지막 입력 개수
+let currentFdTarget = { team: 'blue', type: 'pick' };
+
+function fdGetUsedChamps(team, beforeGame) {
+  const used = [];
+  for (let i = 0; i < beforeGame; i++) {
+    if (fdGames[i]) fdGames[i][team].picks.forEach(c => { if (!used.includes(c)) used.push(c); });
+  }
+  return used;
+}
+
+function fdActionMulti(team, type) {
+  const input = document.getElementById('fdChampInput');
+  const raw = input.value.trim();
+  if (!raw) { input.focus(); return; }
+
+  const gameIdx = 0; // 1경기는 항상 index 0
+  const game = fdGames[gameIdx];
+  const used = fdGetUsedChamps(team, gameIdx);
+
+  const champs = raw.split(',').map(s => {
+    const t = s.trim();
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }).filter(c => c.length > 0);
+
+  const blocked = [];
+  let added = 0;
+  champs.forEach(champ => {
+    if (type === 'pick' && used.map(c=>c.toLowerCase()).includes(champ.toLowerCase())) {
+      blocked.push(champ);
+    } else {
+      if (type === 'pick') game[team].picks.push(champ);
+      else game[team].bans.push(champ);
+      added++;
+    }
+  });
+
+  lastFdCount = added; // 이번 배치 개수 저장
+
+  if (blocked.length > 0) {
+    alert(`⚠️ Fearless 규칙 위반!\n다음 챔피언은 ${team === 'blue' ? '블루' : '레드'}팀이 이전 경기에서 픽했습니다:\n${blocked.join(', ')}`);
+  }
+
+  input.value = '';
+  input.focus();
+  renderFearless();
+}
+
+function fdUndo() {
+  const game = fdGames[0];
+  if (!game) return;
+  // 마지막에 추가된 배치 전체 삭제 (lastFdCount 개수만큼)
+  const count = lastFdCount || 1;
+  for (let i = 0; i < count; i++) {
+    if (game.red.bans.length)        game.red.bans.pop();
+    else if (game.red.picks.length)  game.red.picks.pop();
+    else if (game.blue.bans.length)  game.blue.bans.pop();
+    else if (game.blue.picks.length) game.blue.picks.pop();
+  }
+  lastFdCount = 0;
+  renderFearless();
+}
+
+function fearlessNextGame() {
+  if (fdActiveGames >= MAX_GAMES) return;
+  fdGames.push({ blue: { picks: [], bans: [] }, red: { picks: [], bans: [] } });
+  fdActiveGames++;
+  const btn = document.getElementById('fearlessNextBtn');
+  if (btn) btn.disabled = fdActiveGames >= MAX_GAMES;
+  setFdInputLocked(true); // 이전 입력칸 잠금
+  renderFearless();
+  setTimeout(() => {
+    const container = document.getElementById('fearlessGamesContainer');
+    if (container && container.lastElementChild)
+      container.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function setFdInputLocked(locked) {
+  const input = document.getElementById('fdChampInput');
+  const btns = document.querySelectorAll('#fdBtnArea .fd-action-btn, #fdBtnArea .btn');
+  if (input) {
+    input.disabled = locked;
+    input.style.opacity = locked ? '0.4' : '1';
+    input.placeholder = locked ? '이전 경기 입력 잠금됨' : '챔피언, 챔피언, 챔피언...';
+  }
+  btns.forEach(b => {
+    b.disabled = locked;
+    b.style.opacity = locked ? '0.3' : '1';
+  });
+}
+
+function fearlessReset() {
+  if (!confirm('피어리스 드래프트를 초기화할까요?\n모든 경기 기록이 삭제됩니다.')) return;
+
+  // 1. 데이터 초기화
+  fdGames = [{ blue: { picks: [], bans: [] }, red: { picks: [], bans: [] } }];
+  fdActiveGames = 1;
+
+  // 2. 2~5경기 박스 DOM에서 직접 제거
+  for (let g = 1; g <= MAX_GAMES; g++) {
+    const el = document.getElementById('fdGameBlock' + g);
+    if (el) el.parentNode.removeChild(el);
+  }
+  // 컨테이너도 확실히 비우기
+  const container = document.getElementById('fearlessGamesContainer');
+  if (container) container.innerHTML = '';
+
+  // 3. 다음 경기 버튼 활성화
+  const nextBtn = document.getElementById('fearlessNextBtn');
+  if (nextBtn) nextBtn.disabled = false;
+
+  // 4. 1경기 입력칸 초기화 및 잠금 해제
+  const input = document.getElementById('fdChampInput');
+  if (input) {
+    input.disabled = false;
+    input.style.opacity = '1';
+    input.placeholder = '챔피언, 챔피언, 챔피언...';
+    input.value = '';
+  }
+  document.querySelectorAll('#fdBtnArea .fd-action-btn, #fdBtnArea .btn').forEach(b => {
+    b.disabled = false;
+    b.style.opacity = '1';
+  });
+
+  // 5. 1경기 내용 초기화
+  const blueContent = document.getElementById('fdBlueContent');
+  const redContent  = document.getElementById('fdRedContent');
+  if (blueContent) blueContent.innerHTML = `
+    <div class="fd-section-label">밴</div>
+    <div class="fd-bans"><span style="color:rgba(255,255,255,0.2);font-size:12px;">없음</span></div>
+    <div class="fd-section-label">픽</div>
+    <div class="fd-picks"><span style="color:rgba(255,255,255,0.2);font-size:12px;">없음</span></div>`;
+  if (redContent) redContent.innerHTML = `
+    <div class="fd-section-label">밴</div>
+    <div class="fd-bans"><span style="color:rgba(255,255,255,0.2);font-size:12px;">없음</span></div>
+    <div class="fd-section-label">픽</div>
+    <div class="fd-picks"><span style="color:rgba(255,255,255,0.2);font-size:12px;">없음</span></div>`;
+
+  // 6. 탭 업데이트
+  renderFearlessTabs();
+}
+
+function fdRemoveChamp(gameIdx, team, type, idx) {
+  const game = fdGames[gameIdx];
+  if (!game) return;
+  if (type === 'pick') game[team].picks.splice(idx, 1);
+  else game[team].bans.splice(idx, 1);
+  renderFearless();
+}
+
+function renderFearless() {
+  const container = document.getElementById('fearlessGamesContainer');
+  if (!container) return;
+
+  const nextBtn = document.getElementById('fearlessNextBtn');
+  if (nextBtn) nextBtn.disabled = fdActiveGames >= MAX_GAMES;
+
+  // 1~5경기 탭 항상 표시
+  const tabs = document.getElementById('fearlessGameTabs');
+  if (tabs) {
+    tabs.innerHTML = Array.from({length: MAX_GAMES}, (_, i) => {
+      const isActive = i === fdActiveGames - 1;
+      const isEnabled = i < fdActiveGames;
+      const cls = isActive ? 'fg-tab active' : isEnabled ? 'fg-tab done' : 'fg-tab disabled';
+      return `<div class="${cls}" onclick="${isEnabled ? 'fearlessScrollToGame('+i+')' : ''}">${i+1}경기</div>`;
+    }).join('');
+  }
+
+  function renderTags(arr, type, gameIdx, team) {
+    if (!arr.length) return '<span style="color:rgba(255,255,255,0.2);font-size:12px;padding:2px 0;">없음</span>';
+    return arr.map((c, i) => `
+      <span class="fd-champ-tag ${type}">
+        ${c}
+        <span class="fd-remove" onclick="fdRemoveChamp(${gameIdx},'${team}','${type.includes('ban')?'ban':'pick'}',${i})">✕</span>
+      </span>`).join('');
+  }
+  function renderUsed(arr) {
+    if (!arr.length) return '';
+    return arr.map(c => `<span class="fd-champ-tag used">🚫 ${c}</span>`).join('');
+  }
+
+  // 1경기: 좌우 레이아웃 컬럼에 직접 렌더
+  const game0 = fdGames[0];
+  const blue0Used = fdGetUsedChamps('blue', 0);
+  const red0Used  = fdGetUsedChamps('red',  0);
+  const blueContent = document.getElementById('fdBlueContent');
+  const redContent  = document.getElementById('fdRedContent');
+  if (blueContent) {
+    blueContent.innerHTML = `
+      ${blue0Used.length ? `<div class="fd-used-label">이전 픽 (재사용 불가)</div><div class="fd-used">${renderUsed(blue0Used)}</div>` : ''}
+      <div class="fd-section-label">밴</div>
+      <div class="fd-bans">${renderTags(game0.blue.bans,'ban',0,'blue')}</div>
+      <div class="fd-section-label">픽</div>
+      <div class="fd-picks">${renderTags(game0.blue.picks,'pick-blue',0,'blue')}</div>`;
+  }
+  if (redContent) {
+    redContent.innerHTML = `
+      ${red0Used.length ? `<div class="fd-used-label">이전 픽 (재사용 불가)</div><div class="fd-used">${renderUsed(red0Used)}</div>` : ''}
+      <div class="fd-section-label">밴</div>
+      <div class="fd-bans">${renderTags(game0.red.bans,'ban',0,'red')}</div>
+      <div class="fd-section-label">픽</div>
+      <div class="fd-picks">${renderTags(game0.red.picks,'pick-red',0,'red')}</div>`;
+  }
+
+  if (!container) return;
+  // 2경기 이상: 아래에 누적 박스 (fdActiveGames 기준으로 완전 재렌더)
+  let html = '';
+  for (let g = 1; g < fdActiveGames; g++) {
+    const game = fdGames[g];
+    const blueUsed = fdGetUsedChamps('blue', g);
+    const redUsed  = fdGetUsedChamps('red',  g);
+    const isLast = g === fdActiveGames - 1;
+    html += `
+    <div id="fdGameBlock${g}">
+      <div class="fearless-game-label-bar">
+        <span>${g+1}경기</span>
+        ${isLast ? `<button class="btn btn-reset" style="font-size:11px;padding:3px 10px;" onclick="fdRemoveLastGame()">이 경기 삭제</button>` : ''}
+      </div>
+      <div class="fearless-draft-area">
+        <div class="fd-team fd-blue">
+          <div class="fd-team-header th-blue">BLUE TEAM</div>
+          ${blueUsed.length ? `<div class="fd-used-label">이전 픽 (재사용 불가)</div><div class="fd-used">${renderUsed(blueUsed)}</div>` : ''}
+          <div class="fd-section-label">밴</div>
+          <div class="fd-bans">${renderTags(game.blue.bans,'ban',g,'blue')}</div>
+          <div class="fd-section-label">픽</div>
+          <div class="fd-picks">${renderTags(game.blue.picks,'pick-blue',g,'blue')}</div>
+        </div>
+        <div class="fd-center">
+          <div class="fd-input-wrap">
+            <input class="fd-input" type="text" id="fdChampInput${g}"
+              placeholder="챔피언, 챔피언, 챔피언..."
+              autocomplete="off"
+              onkeydown="if(event.key==='Enter')fdActionMultiG(${g},'blue','pick')"/>
+            <div class="fd-input-btns">
+              <button class="fd-action-btn fd-blue-btn" onclick="fdActionMultiG(${g},'blue','pick')">블루 픽</button>
+              <button class="fd-action-btn fd-red-btn"  onclick="fdActionMultiG(${g},'red','pick')">레드 픽</button>
+            </div>
+            <div class="fd-input-btns">
+              <button class="fd-action-btn fd-ban-btn" onclick="fdActionMultiG(${g},'blue','ban')">블루 밴</button>
+              <button class="fd-action-btn fd-ban-btn" onclick="fdActionMultiG(${g},'red','ban')">레드 밴</button>
+            </div>
+            <button class="btn btn-reset" style="width:100%;margin-top:6px;font-size:12px;" onclick="fdUndoG(${g})">↩ 입력 취소</button>
+          </div>
+          <div class="fd-vs">VS</div>
+        </div>
+        <div class="fd-team fd-red">
+          <div class="fd-team-header th-red">RED TEAM</div>
+          ${redUsed.length ? `<div class="fd-used-label">이전 픽 (재사용 불가)</div><div class="fd-used">${renderUsed(redUsed)}</div>` : ''}
+          <div class="fd-section-label">밴</div>
+          <div class="fd-bans">${renderTags(game.red.bans,'ban',g,'red')}</div>
+          <div class="fd-section-label">픽</div>
+          <div class="fd-picks">${renderTags(game.red.picks,'pick-red',g,'red')}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function renderFearlessTabs() {
+  const tabs = document.getElementById('fearlessGameTabs');
+  if (!tabs) return;
+  tabs.innerHTML = Array.from({length: MAX_GAMES}, (_, i) => {
+    const isActive  = i === fdActiveGames - 1;
+    const isEnabled = i < fdActiveGames;
+    const cls = isActive ? 'fg-tab active' : isEnabled ? 'fg-tab done' : 'fg-tab disabled';
+    return `<div class="${cls}" onclick="${isEnabled ? 'fearlessScrollToGame('+i+')' : ''}">${i+1}경기</div>`;
+  }).join('');
+  const nextBtn = document.getElementById('fearlessNextBtn');
+  if (nextBtn) nextBtn.disabled = fdActiveGames >= MAX_GAMES;
+}
+
+function fearlessScrollToGame(idx) {
+  if (idx === 0) {
+    document.getElementById('fdBlueCol').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    const el = document.getElementById('fdGameBlock'+idx);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function fdRemoveLastGame() {
+  if (fdActiveGames <= 1) return;
+  fdGames.pop();
+  fdActiveGames--;
+  // 마지막 게임 삭제 후 이전 경기 잠금 여부 재설정
+  if (fdActiveGames === 1) setFdInputLocked(false);
+  renderFearless();
+}
+
+function fdActionMultiG(gameIdx, team, type) {
+  const input = document.getElementById('fdChampInput' + gameIdx);
+  if (!input) return;
+  const raw = input.value.trim();
+  if (!raw) { input.focus(); return; }
+  const game = fdGames[gameIdx];
+  const used = fdGetUsedChamps(team, gameIdx);
+  const champs = raw.split(',').map(s => {
+    const t = s.trim();
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }).filter(c => c.length > 0);
+  const blocked = [];
+  let added = 0;
+  champs.forEach(champ => {
+    if (type === 'pick' && used.map(c=>c.toLowerCase()).includes(champ.toLowerCase())) {
+      blocked.push(champ);
+    } else {
+      if (type === 'pick') game[team].picks.push(champ);
+      else game[team].bans.push(champ);
+      added++;
+    }
+  });
+  lastFdCountG[gameIdx] = added; // 이번 배치 개수 저장
+  if (blocked.length > 0) {
+    alert(`⚠️ Fearless 규칙 위반!\n${blocked.join(', ')} - 이미 이전 경기에서 픽했습니다.`);
+  }
+  input.value = '';
+  input.focus();
+  renderFearless();
+}
+
+function fdUndoG(gameIdx) {
+  const game = fdGames[gameIdx];
+  if (!game) return;
+  const count = lastFdCountG[gameIdx] || 1;
+  for (let i = 0; i < count; i++) {
+    if (game.red.bans.length)        game.red.bans.pop();
+    else if (game.red.picks.length)  game.red.picks.pop();
+    else if (game.blue.bans.length)  game.blue.bans.pop();
+    else if (game.blue.picks.length) game.blue.picks.pop();
+  }
+  lastFdCountG[gameIdx] = 0;
+  renderFearless();
+}
+
+
+function openSideSelectGame() {
+  document.getElementById('coinGameModal').classList.add('show');
+  resetCoinGame();
+}
+function closeCoinGame() {
+  document.getElementById('coinGameModal').classList.remove('show');
+}
+function resetCoinGame() {
+  const coin = document.getElementById('coinEl');
+  const result = document.getElementById('coinResult');
+  coin.className = 'coin';
+  coin.innerHTML = '<div class="coin-face coin-front">G</div><div class="coin-face coin-back">G</div>';
+  result.textContent = '';
+  result.className = 'coin-result';
+  document.querySelectorAll('.coin-choice-btn').forEach(b => b.disabled = false);
+}
+function flipCoin(choice) {
+  document.querySelectorAll('.coin-choice-btn').forEach(b => b.disabled = true);
+  const coin = document.getElementById('coinEl');
+  const result = document.getElementById('coinResult');
+  const isHeads = Math.random() < 0.4;
+  const outcome = isHeads ? 'heads' : 'tails';
+  const outcomeKr = isHeads ? '앞' : '뒤';
+  const win = (choice === outcome);
+
+  coin.className = 'coin flipping ' + outcome;
+  result.textContent = '';
+  result.className = 'coin-result';
+
+  setTimeout(() => {
+    result.textContent = win
+      ? `🎉 ${outcomeKr}면! 선택 성공! BLUE TEAM 진영 선택`
+      : `😢 ${outcomeKr}면! 선택 실패! RED TEAM 진영 선택`;
+    result.className = 'coin-result ' + (win ? 'win' : 'lose');
+    document.querySelectorAll('.coin-choice-btn').forEach(b => b.disabled = false);
+  }, 1200);
+}
+
+// ─── 승패 기록 ───
+function recordResult(team, result) {
+  const arr = team === 'blue' ? blueTeam : redTeam;
+  const teamName   = team === 'blue' ? 'BLUE TEAM' : 'RED TEAM';
+  const resultName = result === 'win' ? '승리' : '패배';
+
+  if (arr.filter(p => p).length === 0) {
+    alert('팀에 등록된 플레이어가 없어요!');
+    return;
+  }
+
+  arr.forEach(p => {
+    if (!p) return;
+
+    // DB에 없는 플레이어면 자동 등록
+    if (p.dbIdx < 0 || !playerDB[p.dbIdx]) {
+      const existing = playerDB.findIndex(d => d.lol.toLowerCase() === p.name.toLowerCase());
+      if (existing >= 0) {
+        p.dbIdx = existing;
+      } else {
+        // 신규 등록
+        playerDB.push({
+          chzz: p.name,
+          lol:  p.name,
+          tier: p.tier,
+          mainPos: p.pos,
+          subPos: [],
+          wins: 0,
+          loses: 0
+        });
+        p.dbIdx = playerDB.length - 1;
+      }
+    }
+
+    // 승패 기록
+    if (result === 'win')  playerDB[p.dbIdx].wins++;
+    else                   playerDB[p.dbIdx].loses++;
+  });
+
+  // 확인 알림 - 기록된 플레이어 목록 표시
+  const names = arr.filter(p => p).map(p => {
+    const db = playerDB[p.dbIdx];
+    return db ? db.chzz : p.name;
+  }).join(', ');
+
+  alert(`✅ ${teamName} ${resultName} 기록 완료!\n\n기록된 플레이어:\n${names}`);
+  if (result === 'win') addMatchRecord(team);
+  renderPlayerDB();
+}
+
+// ─── 참가자 목록 렌더 ───
+function renderRoster() {
+  const blueEl = document.getElementById('rosterBlue');
+  const redEl  = document.getElementById('rosterRed');
+  if (!blueEl || !redEl) return;
+
+  function makeRows(team, color) {
+    let html = `<div class="roster-team-header ${color}">${color === 'blue' ? 'BLUE TEAM' : 'RED TEAM'}</div>`;
+    const size = parseInt(document.getElementById('teamSize')?.value || 5);
+    const slots = Array(size).fill(null).map((_, i) => team[i] || null);
+    slots.forEach((p, i) => {
+      html += `<div class="roster-row">`;
+      html += `<span class="pos-badge ${POS_CLASS[p ? p.pos : i]}" style="font-size:11px;padding:2px 7px;">${POS_LIST[p ? p.pos : i]}</span>`;
+      if (p) {
+        // 치지직 닉네임 찾기
+        const db = p.dbIdx >= 0 ? playerDB[p.dbIdx] : null;
+        const chzz = db ? db.chzz : p.name;
+        const warns = db ? (db.warnings||0) : 0;
+        html += `<span class="roster-chzz">${chzz}</span>${warningDot(warns)}`;
+      } else {
+        html += `<span class="roster-empty">비어있음</span>`;
+      }
+      html += `</div>`;
+    });
+    return html;
+  }
+
+  blueEl.innerHTML = makeRows(blueTeam, 'blue');
+  redEl.innerHTML  = makeRows(redTeam,  'red');
+}
+
+// ─── 미러 팀박스 렌더 ───
+function renderMirror() {
+  const blueEl = document.getElementById('mirrorBlue');
+  const redEl  = document.getElementById('mirrorRed');
+  if (!blueEl || !redEl) return;
+
+  function makeRows(team) {
+    let html = '';
+    const size = parseInt(document.getElementById('teamSize')?.value || 5);
+  const slots = Array(size).fill(null).map((_,i) => team[i] || null);
+    slots.forEach((p, i) => {
+      html += `<div class="mirror-row">`;
+      html += `<span class="pos-badge ${POS_CLASS[p ? p.pos : i]}" style="font-size:11px;padding:2px 7px;">${POS_LIST[p ? p.pos : i]}</span>`;
+      if (p) {
+        const db = p.dbIdx >= 0 ? playerDB[p.dbIdx] : null;
+        html += `<span class="player-name" style="cursor:default;">${p.name}</span>`;
+        html += `<span class="tier-badge ${getTierClass(p.tier)}">${p.tier}</span>`;
+      } else {
+        html += `<span class="mirror-empty">비어있음</span>`;
+      }
+      html += `</div>`;
+    });
+    return html;
+  }
+  blueEl.innerHTML = makeRows(blueTeam);
+  redEl.innerHTML  = makeRows(redTeam);
+
+  const ba = document.getElementById('mirrorBlueAvg');
+  const ra = document.getElementById('mirrorRedAvg');
+  if (ba) ba.textContent = blueTeam.filter(p=>p).length ? '평균 ' + getAvgTierLabel(blueTeam.filter(p=>p)) : '';
+  if (ra) ra.textContent = redTeam.filter(p=>p).length  ? '평균 ' + getAvgTierLabel(redTeam.filter(p=>p))  : '';
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  el.classList.add('active');
+  if(tab==='playerdb')renderPlayerDB();
+  if(tab==='fearless')renderFearless();
+  if(tab==='records')renderRecords();
+  if(tab==='roster')renderRosterTab();
+}
+
+function onDragStart2(e, team, idx) {
+  dragState2 = {team, idx};
+  e.dataTransfer.setData('text/plain', 'box2:' + team + ':' + idx);
+  e.dataTransfer.effectAllowed = 'move';
+  const cell = e.currentTarget.closest('.drag-cell');
+  if (cell) setTimeout(() => cell.classList.add('dragging'), 0);
+}
+function onDragEnd2(e) {
+  document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over','dragging'));
+  dragState2 = null;
+}
+function onDragOver2(e, team, idx) {
+  e.preventDefault(); e.stopPropagation();
+  if (!dragState2) return;
+  if (dragState2.team === team && dragState2.idx === idx) return;
+  document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave2(e) { e.currentTarget.classList.remove('drag-over'); }
+
+function onDrop2(e, toTeam, toIdx) {
+  e.preventDefault(); e.stopPropagation();
+  let fromTeam, fromIdx;
+  if (dragState2) { fromTeam=dragState2.team; fromIdx=dragState2.idx; }
+  else {
+    const raw = e.dataTransfer.getData('text/plain');
+    if (!raw || !raw.startsWith('box2:')) return;
+    const parts = raw.split(':');
+    fromTeam=parts[1]; fromIdx=parseInt(parts[2]);
+  }
+  dragState2 = null;
+  document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over','dragging'));
+  if (fromTeam===toTeam && fromIdx===toIdx) return;
+  const fromArr = fromTeam==='blue' ? blueTeam2 : redTeam2;
+  const toArr   = toTeam==='blue'   ? blueTeam2 : redTeam2;
+  const fromPlayer = fromArr[fromIdx] ? {...fromArr[fromIdx]} : null;
+  const toPlayer   = toArr[toIdx]     ? {...toArr[toIdx]}     : null;
+  if (!fromPlayer) return;
+  fromArr[fromIdx] = toPlayer || undefined;
+  if (!toPlayer) fromArr[fromIdx] = undefined;
+  toArr[toIdx] = fromPlayer;
+  if (fromTeam!==toTeam) {
+    if (fromTeam==='blue') blueTeam2=blueTeam2.filter(p=>p!==undefined);
+    else redTeam2=redTeam2.filter(p=>p!==undefined);
+  }
+  renderTable2();
+}
+
+function onTrashOver2(e) { e.preventDefault(); if(dragState2) document.getElementById('trashZone2').classList.add('drag-over'); }
+function onTrashLeave2(e) { document.getElementById('trashZone2').classList.remove('drag-over'); }
+function onTrashDrop2(e) {
+  e.preventDefault();
+  document.getElementById('trashZone2').classList.remove('drag-over');
+  let fromTeam, fromIdx;
+  if (dragState2) { fromTeam=dragState2.team; fromIdx=dragState2.idx; }
+  else {
+    const raw=e.dataTransfer.getData('text/plain');
+    if(!raw||!raw.startsWith('box2:')) return;
+    const parts=raw.split(':'); fromTeam=parts[1]; fromIdx=parseInt(parts[2]);
+  }
+  dragState2=null;
+  const arr = fromTeam==='blue' ? blueTeam2 : redTeam2;
+  arr[fromIdx]=undefined;
+  if(fromTeam==='blue') blueTeam2=blueTeam2.filter(p=>p!==undefined);
+  else redTeam2=redTeam2.filter(p=>p!==undefined);
+  renderTable2();
+}
+
+function togglePosPopup2(e, team, idx, elId) {
+  e.stopPropagation();
+  const el = document.getElementById(elId);
+  if (openPopup && openPopup.elId===elId) { closeAllPopups(); return; }
+  closeAllPopups();
+  const player = team==='blue' ? blueTeam2[idx] : redTeam2[idx];
+  const db = (player.dbIdx>=0) ? playerDB[player.dbIdx] : null;
+  let posList = [];
+  if (db) {
+    posList.push({pos:db.mainPos, label:'주 포지션', isMain:true});
+    db.subPos.forEach(p => posList.push({pos:p, label:'부 포지션', isMain:false}));
+  } else {
+    POS_LIST.forEach((n,i) => posList.push({pos:i, label:n, isMain:i===player.pos}));
+  }
+  const popup = document.createElement('div');
+  popup.className = 'pos-popup show';
+  popup.innerHTML = `<div class="pos-popup-title">포지션 변경</div>` +
+    posList.map(item => `<div class="pos-popup-item ${item.isMain?'is-main':''}" onclick="changePos2(event,'${team}',${idx},${item.pos})">
+      <span class="pos-badge ${POS_CLASS[item.pos]}">${POS_LIST[item.pos]}</span>
+      <span class="pp-label">${item.label}</span></div>`).join('');
+  popup.addEventListener('click', e=>e.stopPropagation());
+  el.appendChild(popup);
+  openPopup = {team, idx, el, elId, popup};
+}
+
+function changePos2(e, team, idx, newPos) {
+  e.stopPropagation();
+  if(team==='blue') blueTeam2[idx].pos=newPos;
+  else redTeam2[idx].pos=newPos;
+  closeAllPopups(); renderTable2();
+}
+
+function recordResult2(team, result) {
+  const arr = team==='blue' ? blueTeam2 : redTeam2;
+  const teamName=team==='blue'?'BLUE TEAM':'RED TEAM';
+  const resultName=result==='win'?'승리':'패배';
+  if(arr.filter(p=>p).length===0){alert('팀에 등록된 플레이어가 없어요!');return;}
+  arr.forEach(p=>{
+    if(!p)return;
+    if(p.dbIdx<0||!playerDB[p.dbIdx]){
+      const ex=playerDB.findIndex(d=>d.lol.toLowerCase()===p.name.toLowerCase());
+      if(ex>=0){p.dbIdx=ex;}
+      else{playerDB.push({chzz:p.name,lol:p.name,tier:p.tier,mainPos:p.pos,subPos:[],wins:0,loses:0});p.dbIdx=playerDB.length-1;}
+    }
+    if(result==='win') playerDB[p.dbIdx].wins++;
+    else playerDB[p.dbIdx].loses++;
+  });
+  const names=arr.filter(p=>p).map(p=>playerDB[p.dbIdx]?playerDB[p.dbIdx].chzz:p.name).join(', ');
+  alert(`✅ ${teamName} ${resultName} 기록 완료!\n\n기록된 플레이어:\n${names}`);
+  renderPlayerDB();
+}
+
+function renderTable2() {
+  closeAllPopups();
+  const tbody = document.getElementById('playerRows2');
+  if (!tbody) return;
+  let html = '';
+  const rows = 5;
+  for (let i=0; i<rows; i++) {
+    const b = blueTeam2[i];
+    const r = redTeam2[i];
+    const bpos = b ? b.pos : i;
+    const rpos = r ? r.pos : i;
+    html += `<div class="player-row">`;
+    html += `<div><span class="pos-badge ${POS_CLASS[bpos]}">${POS_LIST[bpos]}</span></div>`;
+    html += `<div class="drag-cell drag-cell-blue" id="b2slot-${i}"
+      ondragover="onDragOver2(event,'blue',${i})"
+      ondragleave="onDragLeave2(event)"
+      ondrop="onDrop2(event,'blue',${i})">`;
+    if (b) {
+      html += `<span class="drag-handle" draggable="true"
+        ondragstart="onDragStart2(event,'blue',${i})"
+        ondragend="onDragEnd2(event)">⠿</span>
+        <span class="player-name" onclick="togglePosPopup2(event,'blue',${i},'b2slot-${i}')">${b.name}</span>
+        <span class="tier-badge ${getTierClass(b.tier)}">${b.tier}</span>
+        <span class="player-pts">${b.pts} pts</span>`;
+    }
+    html += `</div><div class="vs-cell">VS</div>`;
+    html += `<div><span class="pos-badge ${POS_CLASS[rpos]}">${POS_LIST[rpos]}</span></div>`;
+    html += `<div class="drag-cell drag-cell-red" id="r2slot-${i}"
+      ondragover="onDragOver2(event,'red',${i})"
+      ondragleave="onDragLeave2(event)"
+      ondrop="onDrop2(event,'red',${i})">`;
+    if (r) {
+      html += `<span class="drag-handle" draggable="true"
+        ondragstart="onDragStart2(event,'red',${i})"
+        ondragend="onDragEnd2(event)">⠿</span>
+        <span class="player-name" onclick="togglePosPopup2(event,'red',${i},'r2slot-${i}')">${r.name}</span>
+        <span class="tier-badge ${getTierClass(r.tier)}">${r.tier}</span>
+        <span class="player-pts">${r.pts} pts</span>`;
+    }
+    html += `</div></div>`;
+  }
+  tbody.innerHTML = html;
+  updateScores2();
+}
+
+function updateScores2() {
+  const bT=blueTeam2.filter(p=>p).reduce((s,p)=>s+p.pts,0);
+  const rT=redTeam2.filter(p=>p).reduce((s,p)=>s+p.pts,0);
+  const tot=bT+rT||1;
+  const bP=((bT/tot)*100).toFixed(1);
+  const rP=((rT/tot)*100).toFixed(1);
+  const els = {
+    blueScore2: `${bT}<span class="pts">pts</span>`,
+    redScore2:  `${rT}<span class="pts">pts</span>`,
+  };
+  for(const [id,val] of Object.entries(els)){
+    const el=document.getElementById(id); if(el) el.innerHTML=val;
+  }
+  const vd=document.getElementById('vsDiff2'); if(vd) vd.textContent=`${Math.abs(bT-rT)}pts 차이`;
+  const vb=document.getElementById('vsBar2');
+  if(vb){
+    vb.style.width=bP+'%';
+    const pct=parseFloat(bP);
+    const fs=Math.max(pct-8,0);
+    vb.style.background=`linear-gradient(90deg,#4a7fe8 0%,#7ab0ff ${fs}%,#e87070 ${pct}%,#e84a4a 100%)`;
+  }
+  const bs=document.getElementById('blueStat2'); if(bs) bs.textContent=`${bP}%`;
+  const rs=document.getElementById('redStat2');  if(rs) rs.textContent=`${rP}%`;
+  const bt=document.getElementById('blueTotal2'); if(bt) bt.textContent=bT+'pts';
+  const rt=document.getElementById('redTotal2');  if(rt) rt.textContent=rT+'pts';
+  const ba=document.getElementById('blueAvgTier2'); if(ba) ba.textContent=blueTeam2.filter(p=>p).length?'평균 '+getAvgTierLabel(blueTeam2.filter(p=>p)):'';
+  const ra=document.getElementById('redAvgTier2');  if(ra) ra.textContent=redTeam2.filter(p=>p).length?'평균 '+getAvgTierLabel(redTeam2.filter(p=>p)):'';
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  el.classList.add('active');
+  if(tab==='playerdb')renderPlayerDB();
+  if(tab==='fearless')renderFearless();
+  if(tab==='records')renderRecords();
+  if(tab==='roster')renderRosterTab();
+}
+
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-wrap'))document.getElementById('searchDropdown').classList.remove('show');
+  if(!e.target.closest('.player-info')&&!e.target.closest('.pos-popup'))closeAllPopups();
+  if(e.target===document.getElementById('editModal'))closeEditModal();
+});
+
+// 접속자 정보 배너 표시
+(function() {
+  const accounts = [
+    { id:'LOLTCK01', role:'관리자' },
+    { id:'LOLTCK02', role:'매니저 1' },
+    { id:'LOLTCK03', role:'매니저 2' },
+    { id:'LOLTCK04', role:'매니저 3' },
+    { id:'LOLTCK05', role:'매니저 4' },
+  ];
+  const loggedId = sessionStorage.getItem('loggedId') || localStorage.getItem('loggedId');
+  const acc = accounts.find(a => a.id === loggedId);
+  const idEl   = document.getElementById('bannerUserId');
+  const roleEl = document.getElementById('bannerUserRole');
+  if (idEl)   idEl.textContent = loggedId || 'LOLTCK01';
+  if (roleEl) roleEl.textContent = acc ? acc.role : '관리자';
+})();
+
+renderTable();
+renderPlayerDB();
+renderTable2();
+renderMirror();
+</script>
+</div>
+</body>
+</html>
