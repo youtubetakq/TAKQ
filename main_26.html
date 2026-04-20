@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>T 내전 관리 시스템</title>
+<!-- v2.1 -->
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: linear-gradient(135deg, #a8c8f0 0%, #c5b8e8 100%); min-height: 100vh; min-width: 900px; padding: 24px 40px; }
@@ -254,7 +258,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .player-info-red { justify-content: flex-end; }
 .player-name { font-size: 14px; font-weight: 600; color: #eee; cursor: pointer; border-radius: 4px; padding: 2px 4px; transition: background 0.15s; }
 .player-name:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.drag-handle { color: #666; font-size: 14px; cursor: grab; padding: 0 2px; user-select: none; line-height: 1; }
+.drag-handle { color: #666; font-size: 14px; cursor: grab; padding: 0 2px; user-select: none; line-height: 1; pointer-events: none; }
 .drag-handle:hover { color: #aaa; }
 .drag-handle:active { cursor: grabbing; }
 
@@ -306,8 +310,8 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .playerdb-grid { display: flex; flex-direction: column; gap: 6px; }
 .player-card {
   background: rgba(30,30,60,0.88); border-radius: 8px;
-  padding: 9px 14px; border: 1px solid rgba(255,255,255,0.1);
-  color: white; display: flex; align-items: center; gap: 14px; flex-wrap: nowrap;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white; display: flex; flex-direction: column; overflow: hidden;
 }
 .pc-names { min-width: 140px; max-width: 180px; }
 .pc-name { font-size: 13px; font-weight: 700; color: #00ffa3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -328,6 +332,13 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
   vertical-align: middle; margin-right: 4px;
 }
 .pc-note { font-size: 11px; color: #ffcc66; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; flex-shrink: 0; }
+.pc-expand { background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #aaa; font-size: 11px; padding: 1px 8px; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.15s; }
+.pc-expand:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.pc-champ-section { padding: 6px 16px; border-top: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.15); }
+.pc-champ-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.06); }
+.pc-champ-row:last-child { border-bottom: none; }
+.pc-champ-label { font-size: 10px; color: #777; min-width: 28px; }
+.champ-tag { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 3px; font-size: 11px; background: rgba(255,255,255,0.08); color: #ccc; border: 1px solid rgba(255,255,255,0.1); }
 
 /* 수정 모달 */
 .modal-bg { display: none; position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; }
@@ -916,6 +927,8 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
       </select>
     </div>
     <div class="modal-field"><label>부 포지션 (콤마 구분, 최대 3개)</label><input type="text" id="editSubPos" placeholder="탑,정글"/></div>
+    <div class="modal-field"><label>주 포지션 챔피언 <span style="font-size:10px;color:#888;">(콤마 구분, 최대 5개)</span></label><input type="text" id="editMainChamps" placeholder="카밀, 제이스, 피오라" onkeydown="if(event.key==='Enter')saveEdit()"/></div>
+    <div class="modal-field" id="subChampsFields"></div>
     <div class="modal-field"><label>특이사항</label><input type="text" id="editNote" placeholder="예: 노쇼 주의, 딜 부족 등"/></div>
     <div class="modal-field">
       <label>내전 경고</label>
@@ -1256,30 +1269,30 @@ function changePos(e, team, idx, newPos) {
 }
 
 // ─── 드래그 앤 드롭 ───
+let _dragCell = null;
+
 function onDragStart(e, team, idx) {
   dragState = {team, idx};
   e.dataTransfer.setData('text/plain', team + ':' + idx);
   e.dataTransfer.effectAllowed = 'move';
-  const cell = e.currentTarget.closest('.drag-cell');
-  if (cell) setTimeout(() => cell.classList.add('dragging'), 0);
+  // 드래그 시작 셀 저장
+  _dragCell = document.getElementById((team==='blue'?'bslot-':'rslot-') + idx);
+  if (_dragCell) setTimeout(() => { if(_dragCell) _dragCell.classList.add('dragging'); }, 0);
 }
 function onDragEnd(e) {
-  document.querySelectorAll('.drag-cell').forEach(c => {
-    c.classList.remove('drag-over', 'dragging');
-  });
+  document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over','dragging'));
   dragState = null;
+  _dragCell = null;
 }
 function onDragOver(e, team, idx) {
   e.preventDefault();
-  e.stopPropagation();
   if (!dragState) return;
-  // 같은 셀이면 스킵
   if (dragState.team === team && dragState.idx === idx) return;
   document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over'));
-  e.currentTarget.classList.add('drag-over');
+  const cell = document.getElementById((team==='blue'?'bslot-':'rslot-') + idx);
+  if (cell) cell.classList.add('drag-over');
 }
 function onDragLeave(e) {
-  // relatedTarget이 현재 셀 내부면 무시 (자식 요소로 이동)
   const cell = e.currentTarget;
   const related = e.relatedTarget;
   if (related && cell.contains(related)) return;
@@ -1302,39 +1315,35 @@ function onDrop(e, toTeam, toIdx) {
   dragState = null;
   document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over','dragging'));
 
-  // 같은 자리면 무시
   if (fromTeam === toTeam && fromIdx === toIdx) return;
 
+  // 현재 플레이어 꺼내기
   const fromArr = fromTeam === 'blue' ? blueTeam : redTeam;
   const toArr   = toTeam   === 'blue' ? blueTeam : redTeam;
 
   const fromPlayer = fromArr[fromIdx] ? {...fromArr[fromIdx]} : null;
   const toPlayer   = toArr[toIdx]     ? {...toArr[toIdx]}     : null;
 
-  if (!fromPlayer) return; // 빈 슬롯에서 드래그 시도 무시
+  if (!fromPlayer) return;
 
-  // from 슬롯에 to 내용 넣기 (교환 또는 비우기)
-  if (toPlayer) {
-    fromArr[fromIdx] = toPlayer;
+  // 같은 팀 내 이동
+  if (fromTeam === toTeam) {
+    fromArr[fromIdx] = toPlayer || null;
+    fromArr[toIdx]   = fromPlayer;
+    // null 제거
+    if (fromTeam === 'blue') blueTeam = blueTeam.filter(p => p);
+    else redTeam = redTeam.filter(p => p);
   } else {
-    delete fromArr[fromIdx];
-    fromArr[fromIdx] = undefined;
-  }
-
-  // to 슬롯에 from 내용 넣기
-  toArr[toIdx] = fromPlayer;
-
-  // undefined 정리 (배열 구멍 제거하되 5슬롯 유지)
-  // blueTeam/redTeam을 최대 5 길이로 유지하면서 undefined 제거
-  function cleanArr(arr) {
-    const filled = arr.filter(p => p !== undefined && p !== null);
-    return filled;
-  }
-
-  // 팀 간 이동이면 배열 정리
-  if (fromTeam !== toTeam) {
-    if (fromTeam === 'blue') blueTeam = cleanArr(blueTeam);
-    else redTeam = cleanArr(redTeam);
+    // 다른 팀 간 이동
+    if (toPlayer) {
+      // 서로 교환
+      fromArr[fromIdx] = toPlayer;
+      toArr[toIdx]     = fromPlayer;
+    } else {
+      // from 에서 제거, to 에 추가
+      fromArr.splice(fromIdx, 1);
+      toArr.push(fromPlayer);
+    }
   }
 
   renderTable();
@@ -1344,90 +1353,86 @@ function onDrop(e, toTeam, toIdx) {
 function renderTable() {
   closeAllPopups();
   const tbody = document.getElementById('playerRows');
-  let html = '';
   const size = parseInt(document.getElementById('teamSize')?.value || 5);
   const rows = size;
 
-  for (let i = 0; i < rows; i++) {
-    const b = blueTeam[i];
-    const r = redTeam[i];
-    const bpos = b ? b.pos : i;
-    const rpos = r ? r.pos : i;
+  if (tbody) {
+    let html = '';
+    for (let i = 0; i < rows; i++) {
+      const b = blueTeam[i];
+      const r = redTeam[i];
+      const bpos = b ? b.pos : i;
+      const rpos = r ? r.pos : i;
 
-    html += `<div class="player-row">`;
-
-    // 블루 포지션 배지
-    html += `<div><span class="pos-badge ${POS_CLASS[bpos]}">${POS_LIST[bpos]}</span></div>`;
-
-    // 블루 슬롯 (항상 드롭존)
-    html += `<div class="drag-cell drag-cell-blue" id="bslot-${i}"
-      ondragover="onDragOver(event,'blue',${i})"
-      ondragleave="onDragLeave(event)"
-      ondrop="onDrop(event,'blue',${i})">`;
-    if (b) {
-      html += `<span class="drag-handle" draggable="true"
-        ondragstart="onDragStart(event,'blue',${i})"
-        ondragend="onDragEnd(event)">⠿</span>
-        <span class="player-name" onclick="togglePosPopup(event,'blue',${i},'bslot-${i}')">${b.name}</span>
-        <span class="tier-badge ${getTierClass(b.tier)}">${b.tier}</span>
-        <span class="player-pts">${b.pts} pts</span>`;
+      html += `<div class="player-row">`;
+      html += `<div><span class="pos-badge ${POS_CLASS[bpos]}">${POS_LIST[bpos]}</span></div>`;
+      html += `<div class="drag-cell drag-cell-blue" id="bslot-${i}"
+        draggable="${b ? 'true' : 'false'}"
+        ondragstart="${b ? `onDragStart(event,'blue',${i})` : ''}"
+        ondragend="${b ? 'onDragEnd(event)' : ''}"
+        ondragover="onDragOver(event,'blue',${i})"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event,'blue',${i})">`;
+      if (b) {
+        html += `<span class="drag-handle">⠿</span>
+          <span class="player-name" onclick="event.stopPropagation();togglePosPopup(event,'blue',${i},'bslot-${i}')">${b.name}</span>
+          <span class="tier-badge ${getTierClass(b.tier)}">${b.tier}</span>
+          <span class="player-pts">${b.pts} pts</span>`;
+      }
+      html += `</div>`;
+      html += `<div class="vs-cell">VS</div>`;
+      html += `<div><span class="pos-badge ${POS_CLASS[rpos]}">${POS_LIST[rpos]}</span></div>`;
+      html += `<div class="drag-cell drag-cell-red" id="rslot-${i}"
+        draggable="${r ? 'true' : 'false'}"
+        ondragstart="${r ? `onDragStart(event,'red',${i})` : ''}"
+        ondragend="${r ? 'onDragEnd(event)' : ''}"
+        ondragover="onDragOver(event,'red',${i})"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event,'red',${i})">`;
+      if (r) {
+        html += `<span class="drag-handle">⠿</span>
+          <span class="player-name" onclick="event.stopPropagation();togglePosPopup(event,'red',${i},'rslot-${i}')">${r.name}</span>
+          <span class="tier-badge ${getTierClass(r.tier)}">${r.tier}</span>
+          <span class="player-pts">${r.pts} pts</span>`;
+      }
+      html += `</div>`;
+      html += `</div>`;
     }
-    html += `</div>`;
-
-    html += `<div class="vs-cell">VS</div>`;
-
-    // 레드 포지션 배지
-    html += `<div><span class="pos-badge ${POS_CLASS[rpos]}">${POS_LIST[rpos]}</span></div>`;
-
-    // 레드 슬롯 (항상 드롭존)
-    html += `<div class="drag-cell drag-cell-red" id="rslot-${i}"
-      ondragover="onDragOver(event,'red',${i})"
-      ondragleave="onDragLeave(event)"
-      ondrop="onDrop(event,'red',${i})">`;
-    if (r) {
-      html += `<span class="drag-handle" draggable="true"
-        ondragstart="onDragStart(event,'red',${i})"
-        ondragend="onDragEnd(event)">⠿</span>
-        <span class="player-name" onclick="togglePosPopup(event,'red',${i},'rslot-${i}')">${r.name}</span>
-        <span class="tier-badge ${getTierClass(r.tier)}">${r.tier}</span>
-        <span class="player-pts">${r.pts} pts</span>`;
-    }
-    html += `</div>`;
-
-    html += `</div>`;
+    tbody.innerHTML = html;
   }
-  tbody.innerHTML = html;
+
+  // tbody 없어도 항상 실행
   updateScores();
   renderRoster();
   renderMirror();
 }
 
 function updateScores() {
-  const bT=blueTeam.reduce((s,p)=>s+p.pts,0);
-  const rT=redTeam.reduce((s,p)=>s+p.pts,0);
+  const bTeam = blueTeam.filter(p => p);
+  const rTeam = redTeam.filter(p => p);
+  const bT=bTeam.reduce((s,p)=>s+p.pts,0);
+  const rT=rTeam.reduce((s,p)=>s+p.pts,0);
   const tot=bT+rT||1;
   const bP=((bT/tot)*100).toFixed(1);
   const rP=((rT/tot)*100).toFixed(1);
-  document.getElementById('blueScore').innerHTML=`${bT}<span class="pts">pts</span>`;
-  document.getElementById('redScore').innerHTML=`${rT}<span class="pts">pts</span>`;
-  document.getElementById('vsDiff').textContent=`${Math.abs(bT-rT)}pts 차이`;
+  const blueScoreEl = document.getElementById('blueScore'); if(blueScoreEl) blueScoreEl.innerHTML=`${bT}<span class="pts">pts</span>`;
+  const redScoreEl  = document.getElementById('redScore');  if(redScoreEl)  redScoreEl.innerHTML=`${rT}<span class="pts">pts</span>`;
+  const vsDiffEl    = document.getElementById('vsDiff');    if(vsDiffEl)    vsDiffEl.textContent=`${Math.abs(bT-rT)}pts 차이`;
   const vsBarEl = document.getElementById('vsBar');
-  vsBarEl.style.width = bP + '%';
-  // fill은 파란색, 오른쪽 끝만 그라데이션으로 자연스럽게 이어지게
-  vsBarEl.style.background = `linear-gradient(90deg, #4a7fe8 0%, #7ab0ff 70%, #b060c0 90%, #e84a4a 100%)`;
-  document.getElementById('blueStat').textContent=`${bP}%`;
-  document.getElementById('redStat').textContent=`${rP}%`;
-  document.getElementById('blueTotal').textContent=bT+'pts';
-  document.getElementById('redTotal').textContent=rT+'pts';
+  if(vsBarEl){ vsBarEl.style.width = bP + '%'; vsBarEl.style.background = `linear-gradient(90deg, #4a7fe8 0%, #7ab0ff 70%, #b060c0 90%, #e84a4a 100%)`; }
+  const blueStatEl = document.getElementById('blueStat'); if(blueStatEl) blueStatEl.textContent=`${bP}%`;
+  const redStatEl  = document.getElementById('redStat');  if(redStatEl)  redStatEl.textContent=`${rP}%`;
+  const blueTotalEl = document.getElementById('blueTotal'); if(blueTotalEl) blueTotalEl.textContent=bT+'pts';
+  const redTotalEl  = document.getElementById('redTotal');  if(redTotalEl)  redTotalEl.textContent=rT+'pts';
 
   // 평균 티어 계산
   const blueAvg = document.getElementById('blueAvgTier');
   const redAvg  = document.getElementById('redAvgTier');
-  if (blueAvg) blueAvg.textContent = blueTeam.length ? '평균 ' + getAvgTierLabel(blueTeam) : '';
-  if (redAvg)  redAvg.textContent  = redTeam.length  ? '평균 ' + getAvgTierLabel(redTeam)  : '';
-  const all=[...blueTeam,...redTeam];
-  document.getElementById('countNow').textContent=all.length;
-  document.getElementById('avgPts').textContent=all.length?Math.round(all.reduce((s,p)=>s+p.pts,0)/all.length):0;
+  if (blueAvg) blueAvg.textContent = bTeam.length ? '평균 ' + getAvgTierLabel(bTeam) : '';
+  if (redAvg)  redAvg.textContent  = rTeam.length  ? '평균 ' + getAvgTierLabel(rTeam)  : '';
+  const all=[...bTeam,...rTeam];
+  const countEl = document.getElementById('countNow'); if(countEl) countEl.textContent=all.length;
+  const avgEl   = document.getElementById('avgPts');   if(avgEl)   avgEl.textContent=all.length?Math.round(all.reduce((s,p)=>s+p.pts,0)/all.length):0;
 }
 
 // ─── PLAYER DB ───
@@ -1444,29 +1449,45 @@ function renderPlayerDB() {
     const subBadges = p.subPos.map(s =>
       `<span class="pos-badge ${POS_CLASS[s]}" style="opacity:0.65;font-size:11px;padding:2px 7px;">${POS_LIST[s]}</span>`
     ).join('');
+    // 주포지션 챔피언
+    const mainChamps = (p.mainChamps||[]).slice(0,5);
+    const mainChampsHtml = mainChamps.map(c=>`<span class="champ-tag">${c}</span>`).join('');
+    // 부포지션 챔피언
+    const subChamps = p.subChamps || {};
+    const subChampsHtml = (p.subPos||[]).map(pos=>{
+      const champs = (subChamps[pos]||[]).slice(0,5);
+      const champsHtml = champs.map(c=>`<span class="champ-tag">${c}</span>`).join('');
+      return `<div class="pc-champ-row">
+        <span class="pos-badge ${POS_CLASS[pos]}" style="font-size:10px;padding:1px 6px;">${POS_LIST[pos]}</span>
+        ${champsHtml||'<span style="color:rgba(255,255,255,0.2);font-size:11px;">-</span>'}
+      </div>`;
+    }).join('');
+    const hasChamps = mainChamps.length > 0 || Object.keys(subChamps).length > 0;
     return `
-    <div class="player-card">
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+    <div class="player-card" style="flex-direction:column;padding:0;gap:0;">
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 14px;">
         ${warningDot(p.warnings)}
+        <div class="pc-names">
+          <div class="pc-name">${p.chzz}</div>
+          <div class="pc-lol">${p.lol}</div>
+        </div>
+        <div class="pc-tier-wrap">
+          <span class="tier-badge ${tc}">${p.tier}</span>
+        </div>
+        <div class="pc-divider"></div>
+        ${p.note ? `<div class="pc-note" title="${p.note}">📌 ${p.note}</div>` : ''}
+        <div style="flex:1;"></div>
+        <div class="pc-actions">
+          <button class="btn btn-edit" onclick="openEditModal(${i})">수정</button>
+          <button class="btn btn-del" onclick="deletePlayer(${i})">삭제</button>
+        </div>
       </div>
-      <div class="pc-names">
-        <div class="pc-name">${p.chzz}</div>
-        <div class="pc-lol">${p.lol}</div>
-      </div>
-      <div class="pc-tier-wrap">
-        <span class="tier-badge ${tc}">${p.tier}</span>
-      </div>
-      <div class="pc-divider"></div>
-      <div class="pc-pos">
-        <span class="pos-badge ${POS_CLASS[p.mainPos]}" style="font-size:11px;padding:2px 7px;">${POS_LIST[p.mainPos]}</span>
-        ${subBadges}
-      </div>
-      ${p.note ? `<div class="pc-note" title="${p.note}">📌 ${p.note}</div>` : ''}
-      <div style="flex:1;"></div>
-
-      <div class="pc-actions">
-        <button class="btn btn-edit" onclick="openEditModal(${i})">수정</button>
-        <button class="btn btn-del" onclick="deletePlayer(${i})">삭제</button>
+      <div class="pc-champ-section">
+        <div class="pc-champ-row">
+          <span class="pos-badge ${POS_CLASS[p.mainPos]}" style="font-size:10px;padding:1px 6px;">${POS_LIST[p.mainPos]}</span>
+          ${mainChampsHtml||'<span style="color:rgba(255,255,255,0.2);font-size:11px;">챔피언 미등록</span>'}
+        </div>
+        ${subChampsHtml}
       </div>
     </div>`;
   }).join('');
@@ -1493,7 +1514,7 @@ function dbAddPlayer() {
   const subPos  = subStr ? subStr.split(',').map(s => getPosIndex(s.trim())).slice(0, 3) : [];
   const exists  = playerDB.findIndex(p => p.lol.toLowerCase() === lol.toLowerCase());
   if (exists !== -1) { alert('이미 등록된 선수예요.'); return; }
-  playerDB.push({ chzz, lol, tier, mainPos, subPos, wins: 0, loses: 0, note: '', warnings: 0 });
+  playerDB.push({ chzz, lol, tier, mainPos, subPos, mainChamps: [], subChamps: {}, wins: 0, loses: 0, note: '', warnings: 0 });
   const newIdx = playerDB.length - 1;
   if(window.fbSavePlayer) window.fbSavePlayer(newIdx);
   renderPlayerDB();
@@ -1509,6 +1530,28 @@ function openEditModal(idx) {
   document.getElementById('editMainPos').value=p.mainPos;
   document.getElementById('editSubPos').value=p.subPos.map(i=>POS_LIST[i]).join(',');
   document.getElementById('editNote').value=p.note||'';
+  document.getElementById('editMainChamps').value=(p.mainChamps||[]).join(', ');
+  // 부포지션별 챔피언 입력칸 동적 생성
+  const subFields = document.getElementById('subChampsFields');
+  subFields.innerHTML = '';
+  (p.subPos||[]).forEach(pos => {
+    const champs = (p.subChamps||{})[pos]||[];
+    const label = document.createElement('label');
+    label.style.cssText = 'font-size:12px;color:#aaa;display:block;margin-bottom:4px;margin-top:8px;';
+    label.innerHTML = `<span class="pos-badge ${POS_CLASS[pos]}" style="font-size:10px;padding:1px 6px;vertical-align:middle;">${POS_LIST[pos]}</span> 챔피언 <span style="font-size:10px;color:#777;">(콤마 구분, 최대 5개)</span>`;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'subChamps_' + pos;
+    input.placeholder = '챔피언, 챔피언, 챔피언...';
+    input.value = champs.join(', ');
+    input.style.cssText = 'width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-size:13px;outline:none;font-family:inherit;';
+    input.onkeydown = (e) => { if(e.key==='Enter') saveEdit(); };
+    subFields.appendChild(label);
+    subFields.appendChild(input);
+  });
+  if((p.subPos||[]).length === 0) {
+    subFields.innerHTML = '<p style="font-size:12px;color:#666;margin-top:4px;">부 포지션이 없습니다.</p>';
+  }
   document.getElementById('editWarn1').checked = (p.warnings||0) >= 1;
   document.getElementById('editWarn2').checked = (p.warnings||0) >= 2;
   document.getElementById('editModal').classList.add('show');
@@ -1527,6 +1570,18 @@ function saveEdit(){
     loses: playerDB[idx].loses,
     note: document.getElementById('editNote').value.trim(),
     warnings: (document.getElementById('editWarn1').checked ? 1 : 0) + (document.getElementById('editWarn2').checked ? 1 : 0),
+    mainChamps: document.getElementById('editMainChamps').value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5),
+    subChamps: (()=>{
+      const obj={};
+      const p2 = playerDB[idx];
+      (p2.subPos||[]).forEach(pos=>{
+        const el = document.getElementById('subChamps_'+pos);
+        if(!el) return;
+        const champs = el.value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5);
+        if(champs.length) obj[pos] = champs;
+      });
+      return obj;
+    })(),
   };
   closeEditModal();
   renderPlayerDB();
