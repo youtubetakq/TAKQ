@@ -1577,31 +1577,36 @@ function openEditModal(idx) {
 }
 function closeEditModal(){document.getElementById('editModal').classList.remove('show');}
 function saveEdit(){
-  const idx=+document.getElementById('editIdx').value;
-  const subStr=document.getElementById('editSubPos').value;
-  playerDB[idx]={
-    chzz: document.getElementById('editChzz').value.trim(),
-    lol:  document.getElementById('editLol').value.trim(),
-    tier: document.getElementById('editTier').value.trim(),
-    mainPos: +document.getElementById('editMainPos').value,
-    subPos: subStr?subStr.split(',').map(s=>getPosIndex(s.trim())).slice(0,3):[],
-    wins: playerDB[idx].wins,
-    loses: playerDB[idx].loses,
-    note: document.getElementById('editNote').value.trim(),
+  const idx = +document.getElementById('editIdx').value;
+  const subStr = document.getElementById('editSubPos').value;
+  const newSubPos = subStr ? subStr.split(',').map(s=>getPosIndex(s.trim())).slice(0,3) : [];
+
+  // subChamps를 먼저 읽기 (playerDB 덮어쓰기 전에)
+  const subChampsObj = {};
+  newSubPos.forEach(pos => {
+    const el = document.getElementById('subChamps_' + pos);
+    if (!el) return;
+    const champs = el.value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5);
+    if (champs.length) subChampsObj[pos] = champs;
+  });
+
+  playerDB[idx] = {
+    chzz:     document.getElementById('editChzz').value.trim(),
+    lol:      document.getElementById('editLol').value.trim(),
+    tier:     document.getElementById('editTier').value.trim(),
+    mainPos:  +document.getElementById('editMainPos').value,
+    subPos:   newSubPos,
+    wins:     playerDB[idx].wins,
+    loses:    playerDB[idx].loses,
+    note:     document.getElementById('editNote').value.trim(),
     warnings: (document.getElementById('editWarn1').checked ? 1 : 0) + (document.getElementById('editWarn2').checked ? 1 : 0),
     mainChamps: document.getElementById('editMainChamps').value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5),
-    subChamps: (()=>{
-      const obj={};
-      const p2 = playerDB[idx];
-      (p2.subPos||[]).forEach(pos=>{
-        const el = document.getElementById('subChamps_'+pos);
-        if(!el) return;
-        const champs = el.value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5);
-        if(champs.length) obj[pos] = champs;
-      });
-      return obj;
-    })(),
+    subChamps: subChampsObj,
   };
+
+  // Firebase 저장
+  if (window.fbSavePlayer) window.fbSavePlayer(idx);
+
   closeEditModal();
   renderPlayerDB();
 }
