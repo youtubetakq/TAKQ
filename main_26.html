@@ -1286,6 +1286,7 @@ function onDragEnd(e) {
 }
 function onDragOver(e, team, idx) {
   e.preventDefault();
+  e.stopPropagation();
   if (!dragState) return;
   if (dragState.team === team && dragState.idx === idx) return;
   document.querySelectorAll('.drag-cell').forEach(c => c.classList.remove('drag-over'));
@@ -1367,12 +1368,11 @@ function renderTable() {
       html += `<div class="player-row">`;
       html += `<div><span class="pos-badge ${POS_CLASS[bpos]}">${POS_LIST[bpos]}</span></div>`;
       html += `<div class="drag-cell drag-cell-blue" id="bslot-${i}"
-        draggable="${b ? 'true' : 'false'}"
-        ondragstart="${b ? `onDragStart(event,'blue',${i})` : ''}"
-        ondragend="${b ? 'onDragEnd(event)' : ''}"
+        ${b ? `draggable="true" ondragstart="onDragStart(event,'blue',${i})" ondragend="onDragEnd(event)"` : ''}
         ondragover="onDragOver(event,'blue',${i})"
         ondragleave="onDragLeave(event)"
-        ondrop="onDrop(event,'blue',${i})">`;
+        ondrop="onDrop(event,'blue',${i})"
+        style="${!b ? 'min-height:36px;' : ''}">`;
       if (b) {
         html += `<span class="drag-handle">⠿</span>
           <span class="player-name" onclick="event.stopPropagation();togglePosPopup(event,'blue',${i},'bslot-${i}')">${b.name}</span>
@@ -1383,12 +1383,11 @@ function renderTable() {
       html += `<div class="vs-cell">VS</div>`;
       html += `<div><span class="pos-badge ${POS_CLASS[rpos]}">${POS_LIST[rpos]}</span></div>`;
       html += `<div class="drag-cell drag-cell-red" id="rslot-${i}"
-        draggable="${r ? 'true' : 'false'}"
-        ondragstart="${r ? `onDragStart(event,'red',${i})` : ''}"
-        ondragend="${r ? 'onDragEnd(event)' : ''}"
+        ${r ? `draggable="true" ondragstart="onDragStart(event,'red',${i})" ondragend="onDragEnd(event)"` : ''}
         ondragover="onDragOver(event,'red',${i})"
         ondragleave="onDragLeave(event)"
-        ondrop="onDrop(event,'red',${i})">`;
+        ondrop="onDrop(event,'red',${i})"
+        style="${!r ? 'min-height:36px;' : ''}">`;
       if (r) {
         html += `<span class="drag-handle">⠿</span>
           <span class="player-name" onclick="event.stopPropagation();togglePosPopup(event,'red',${i},'rslot-${i}')">${r.name}</span>
