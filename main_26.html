@@ -231,11 +231,13 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 /* 드래그 가능한 개별 셀 */
 .drag-cell {
   display: flex; align-items: center; gap: 8px;
-  cursor: default; border-radius: 6px; padding: 3px 4px;
+  cursor: grab; border-radius: 6px; padding: 3px 4px;
   transition: background 0.15s;
   flex-wrap: wrap;
   position: relative;
   min-height: 36px;
+  -webkit-user-drag: element;
+  user-select: none;
 }
 /* 드래그 중 자식 요소가 dragleave 발동시키지 않도록 */
 .drag-cell.drag-over > * { pointer-events: none; }
@@ -258,7 +260,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .player-info-red { justify-content: flex-end; }
 .player-name { font-size: 14px; font-weight: 600; color: #eee; cursor: pointer; border-radius: 4px; padding: 2px 4px; transition: background 0.15s; }
 .player-name:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.drag-handle { color: #666; font-size: 14px; cursor: grab; padding: 0 2px; user-select: none; line-height: 1; pointer-events: none; }
+.drag-handle { color: #666; font-size: 14px; padding: 0 2px; line-height: 1; pointer-events: none; user-select: none; }
 .drag-handle:hover { color: #aaa; }
 .drag-handle:active { cursor: grabbing; }
 
