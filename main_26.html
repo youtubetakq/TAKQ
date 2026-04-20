@@ -1481,14 +1481,31 @@ function renderPlayerDB() {
         </div>
       </div>
       <div class="pc-champ-section">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-          <span style="font-size:10px;color:#666;min-width:46px;">주 포지션</span>
+        <!-- 주 포지션 -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.07);">
+          <span style="font-size:10px;color:#aaa;font-weight:700;min-width:46px;flex-shrink:0;">주 포지션</span>
+          <div style="width:1px;height:16px;background:rgba(255,255,255,0.2);flex-shrink:0;"></div>
           <span class="pos-badge ${POS_CLASS[p.mainPos]}" style="font-size:10px;padding:1px 6px;">${POS_LIST[p.mainPos]}</span>
-          ${mainChampsHtml||'<span style="color:rgba(255,255,255,0.2);font-size:11px;">챔피언 미등록</span>'}
+          ${mainChampsHtml||'<span style="color:rgba(255,255,255,0.2);font-size:11px;">미등록</span>'}
         </div>
         ${(p.subPos||[]).length > 0 ? `
-        <div style="font-size:10px;color:#666;margin:4px 0 2px;">부 포지션</div>
-        ${subChampsHtml}
+        <!-- 부 포지션 -->
+        <div style="padding-top:6px;">
+          <div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:10px;color:#aaa;font-weight:700;min-width:46px;flex-shrink:0;padding-top:3px;">부 포지션</span>
+            <div style="width:1px;background:rgba(255,255,255,0.2);flex-shrink:0;align-self:stretch;"></div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              ${(p.subPos||[]).map(pos => {
+                const champs = (subChamps[pos]||[]).slice(0,5);
+                const champsHtml = champs.map(c=>`<span class="champ-tag">${c}</span>`).join('');
+                return `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                  <span class="pos-badge ${POS_CLASS[pos]}" style="font-size:10px;padding:1px 6px;">${POS_LIST[pos]}</span>
+                  ${champsHtml||'<span style="color:rgba(255,255,255,0.2);font-size:11px;">미등록</span>'}
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
         ` : ''}
       </div>
     </div>`;
