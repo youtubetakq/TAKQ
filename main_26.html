@@ -1320,7 +1320,6 @@ function onDrop(e, toTeam, toIdx) {
 
   if (fromTeam === toTeam && fromIdx === toIdx) return;
 
-  // 현재 플레이어 꺼내기
   const fromArr = fromTeam === 'blue' ? blueTeam : redTeam;
   const toArr   = toTeam   === 'blue' ? blueTeam : redTeam;
 
@@ -1329,21 +1328,19 @@ function onDrop(e, toTeam, toIdx) {
 
   if (!fromPlayer) return;
 
-  // 같은 팀 내 이동
   if (fromTeam === toTeam) {
-    fromArr[fromIdx] = toPlayer || null;
-    fromArr[toIdx]   = fromPlayer;
-    // null 제거
-    if (fromTeam === 'blue') blueTeam = blueTeam.filter(p => p);
-    else redTeam = redTeam.filter(p => p);
+    // 같은 팀 내 이동 - splice로 순서 변경
+    fromArr.splice(fromIdx, 1);         // 원래 위치에서 제거
+    const insertIdx = toIdx > fromIdx ? toIdx - 1 : toIdx;
+    fromArr.splice(insertIdx, 0, fromPlayer); // 목표 위치에 삽입
+    if (fromTeam === 'blue') blueTeam = fromArr;
+    else redTeam = fromArr;
   } else {
     // 다른 팀 간 이동
     if (toPlayer) {
-      // 서로 교환
       fromArr[fromIdx] = toPlayer;
       toArr[toIdx]     = fromPlayer;
     } else {
-      // from 에서 제거, to 에 추가
       fromArr.splice(fromIdx, 1);
       toArr.push(fromPlayer);
     }
