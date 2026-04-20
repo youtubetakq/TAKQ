@@ -1481,11 +1481,15 @@ function renderPlayerDB() {
         </div>
       </div>
       <div class="pc-champ-section">
-        <div class="pc-champ-row">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+          <span style="font-size:10px;color:#666;min-width:46px;">주 포지션</span>
           <span class="pos-badge ${POS_CLASS[p.mainPos]}" style="font-size:10px;padding:1px 6px;">${POS_LIST[p.mainPos]}</span>
           ${mainChampsHtml||'<span style="color:rgba(255,255,255,0.2);font-size:11px;">챔피언 미등록</span>'}
         </div>
+        ${(p.subPos||[]).length > 0 ? `
+        <div style="font-size:10px;color:#666;margin:4px 0 2px;">부 포지션</div>
         ${subChampsHtml}
+        ` : ''}
       </div>
     </div>`;
   }).join('');
