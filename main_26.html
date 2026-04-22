@@ -2970,6 +2970,18 @@ renderMirror();
   // matchRecords 전체 저장
   window.fbSaveMatchRecords = async function() {
     try {
+      // 기존 Firebase 문서 전체 가져오기
+      const snap = await getDocs(collection(db, 'matchRecords'));
+      // 현재 배열 수보다 많은 문서 삭제 (이전에 남은 데이터 제거)
+      const deletePromises = [];
+      snap.forEach(d => {
+        const idx = parseInt(d.id);
+        if (idx >= matchRecords.length) {
+          deletePromises.push(deleteDoc(doc(db, 'matchRecords', d.id)));
+        }
+      });
+      await Promise.all(deletePromises);
+      // 현재 배열 저장
       for (let i = 0; i < matchRecords.length; i++) {
         await setDoc(doc(db, 'matchRecords', String(i)), { ...matchRecords[i], _idx: i });
       }
