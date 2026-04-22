@@ -10,27 +10,67 @@
 <!-- v2.1 -->
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: linear-gradient(135deg, #a8c8f0 0%, #c5b8e8 100%); min-height: 100vh; min-width: 900px; padding: 24px 40px; }
-.site-wrap { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #252840; min-height: 100vh; min-width: 900px; padding: 24px 40px; }
+.site-wrap { max-width: 1400px; margin: 0 auto; }
 
 /* 네비 */
-.navbar { display: flex; width: 100%; border-bottom: 2px solid rgba(255,255,255,0.3); border-radius: 16px 16px 0 0; overflow: hidden; }
-.nav-item { flex: 1; padding: 14px 10px; text-align: center; font-size: 14px; font-weight: 600; color: #3a3a6a; cursor: pointer; border-right: 1px solid rgba(180,180,220,0.4); background: rgba(255,255,255,0.35); transition: background 0.2s; user-select: none; }
+.navbar {
+  display: flex; width: 100%;
+  background: rgba(15,16,30,0.95);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  position: relative;
+}
+.nav-item {
+  flex: 1; padding: 15px 10px; text-align: center;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer; user-select: none;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  transition: color 0.3s, text-shadow 0.3s, background 0.3s;
+}
 .nav-item:last-child { border-right: none; }
-.nav-item:hover { background: rgba(255,255,255,0.55); }
-.nav-item.active { background: rgba(255,255,255,0.65); color: #2a2a6a; font-weight: 700; }
+.nav-item::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4a7fe8, #a06ae8);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+  border-radius: 2px 2px 0 0;
+}
+.nav-item::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(100,130,255,0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.nav-item:hover { color: rgba(255,255,255,0.85); text-shadow: 0 0 8px rgba(74,127,232,0.6); }
+.nav-item:hover::before { transform: scaleX(0.7); }
+.nav-item:hover::after { opacity: 1; }
+.nav-item.active {
+  color: #7ac0ff;
+  text-shadow: 0 0 10px rgba(74,127,232,1), 0 0 20px rgba(74,127,232,0.5);
+  background: rgba(74,127,232,0.08);
+}
+.nav-item.active::before { transform: scaleX(1); }
+.nav-item.active::after { opacity: 1; }
 
 /* 메인 */
 .main-content { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
 .top-area { display: flex; align-items: flex-start; gap: 16px; width: 100%; justify-content: space-between; flex-wrap: wrap; }
 
 /* 필터박스 */
-.filter-box { background: rgba(170,195,230,0.55); border: 1px solid rgba(255,255,255,0.55); border-radius: 8px; padding: 10px 14px; flex: 1 1 auto; width: fit-content; min-width: 0; }
+.filter-box { background: rgba(30,30,60,0.85); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 14px; flex: 1 1 auto; width: fit-content; min-width: 0; }
 .filter-row1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .filter-row2 { display: flex; align-items: center; gap: 8px; position: relative; }
-.filter-label { font-size: 13px; color: #2a2a5a; font-weight: 600; white-space: nowrap; }
-.filter-select { padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(100,100,180,0.4); background: rgba(255,255,255,0.85); font-size: 13px; color: #333; cursor: pointer; outline: none; min-width: 80px; }
-.checkbox-wrap { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #2a2a5a; font-weight: 600; cursor: pointer; }
+.filter-label { font-size: 13px; color: #c0c8f0; font-weight: 600; white-space: nowrap; }
+.filter-select { padding: 7px 14px; border-radius: 6px; border: 1.5px solid rgba(74,127,232,0.5); background: rgba(20,25,50,0.9); font-size: 13px; color: #e0e8ff; cursor: pointer; outline: none; min-width: 80px; transition: border-color 0.2s; }
+.checkbox-wrap { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #c0c8f0; font-weight: 600; cursor: pointer; }
 .checkbox-wrap input[type=checkbox] { width: 16px; height: 16px; accent-color: #5a6fe8; cursor: pointer; }
 
 .btn { padding: 6px 14px; border-radius: 6px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
@@ -39,8 +79,8 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .btn-auto { background: #7b6fe8; color: white; }
 .btn-random { background: #f0a050; color: white; }
 .btn-team { background: #e06060; color: white; }
-.btn-reset { background: rgba(255,255,255,0.7); color: #3a3a6a; border: 1px solid rgba(100,100,180,0.3); }
-.btn-search { background: rgba(255,255,255,0.7); color: #3a3a6a; border: 1px solid rgba(100,100,180,0.3); }
+.btn-reset { background: rgba(220,50,50,0.2); color: #ff7070; border: 1px solid rgba(220,50,50,0.5); }
+.btn-search { background: rgba(30,160,80,0.25); color: #60e090; border: 1px solid rgba(30,160,80,0.5); }
 .btn-edit { background: #5a8ae8; color: white; font-size: 12px; padding: 4px 10px; }
 .btn-del { background: #e84a4a; color: white; font-size: 12px; padding: 4px 10px; }
 
@@ -48,12 +88,12 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .team-toggle .t-blue { padding: 5px 10px; background: #4a7fe8; color: white; font-size: 11px; font-weight: 700; cursor: pointer; line-height: 1.3; text-align: center; }
 .team-toggle .t-red { padding: 5px 10px; background: #e84a4a; color: white; font-size: 11px; font-weight: 700; cursor: pointer; line-height: 1.3; text-align: center; }
 
-.count-text { font-size: 13px; color: #3a3a6a; font-weight: 600; white-space: nowrap; }
+.count-text { font-size: 11px; color: #8888aa; font-weight: 600; white-space: nowrap; }
 
 /* 검색창 */
-.search-wrap { position: relative; }
-.search-input { padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(100,100,180,0.3); background: rgba(255,255,255,0.75); font-size: 13px; color: #333; outline: none; width: 300px; }
-.search-input::placeholder { color: #aaa; }
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-input { padding: 7px 14px; border-radius: 6px; border: 1.5px solid rgba(74,127,232,0.5); background: rgba(20,25,50,0.9); font-size: 13px; color: #e0e8ff; outline: none; width: 300px; transition: border-color 0.2s, box-shadow 0.2s; }
+.search-input::placeholder { color: rgba(150,160,200,0.6); }
 .search-dropdown { position: absolute; top: 110%; left: 0; width: 380px; background: white; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 999; max-height: 220px; overflow-y: auto; display: none; }
 .search-dropdown.show { display: block; }
 .search-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; transition: background 0.15s; }
@@ -97,7 +137,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .banner-logo { height: clamp(55px, 7vw, 100px); object-fit: contain; }
 
 /* VS 박스 */
-.vs-box { background: rgba(30,30,60,0.85); border-radius: 8px; padding: 14px 20px; color: white; }
+.vs-box { background: rgba(30,30,60,0.85); border-radius: 8px; padding: 14px 20px; color: white; border: 1.5px solid rgba(255,255,255,0.15); }
 .vs-scores { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .score-blue { font-size: 28px; font-weight: 900; color: #6ab0ff; }
 .score-blue .pts { font-size: 13px; color: #aaa; font-weight: 400; margin-left: 2px; }
@@ -117,21 +157,36 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .mirror-teams { display: flex; gap: 12px; width: 100%; }
 .mirror-box {
   flex: 1; min-width: 0;
-  background: rgba(30,30,60,0.85);
   border-radius: 8px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
+}
+.mirror-blue {
+  background: rgba(74,110,200,0.75);
+  border: 1.5px solid #3a8fff;
+  box-shadow: 0 0 14px rgba(58,143,255,0.7), 0 0 35px rgba(58,143,255,0.3);
+}
+.mirror-red {
+  background: rgba(200,60,60,0.75);
+  border: 1.5px solid #ff4444;
+  box-shadow: 0 0 14px rgba(255,68,68,0.7), 0 0 35px rgba(255,68,68,0.3);
 }
 .mirror-header {
   padding: 10px 16px; font-size: 13px; font-weight: 700;
-  background: rgba(0,0,0,0.3);
   display: flex; align-items: center;
+}
+.mirror-blue .mirror-header {
+  background: #417aea;
+  border-bottom: 1px solid rgba(58,143,255,0.3);
+}
+.mirror-red .mirror-header {
+  background: #d6485d;
+  border-bottom: 1px solid rgba(255,68,68,0.3);
 }
 .mirror-row {
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 16px; border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 9px 16px; border-top: 1px solid rgba(255,255,255,0.05);
 }
 .mirror-empty { color: rgba(255,255,255,0.2); font-size: 12px; font-style: italic; }
-.mirror-btns { display: flex; gap: 8px; justify-content: flex-end; padding: 8px 16px; border-top: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.15); }
+.mirror-btns { display: flex; gap: 8px; justify-content: flex-end; padding: 8px 16px; border-top: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.25); }
 .trash-area {
   grid-column: 1;
   display: flex; align-items: center; justify-content: center;
@@ -210,12 +265,18 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 }
 .coin-result.win  { color: #6ab0ff; }
 .coin-result.lose { color: #ff6a6a; }
-.player-table-wrap { background: rgba(30,30,60,0.85); border-radius: 0; overflow: visible; position: relative; }
+.player-table-wrap { background: rgba(30,30,60,0.85); border-radius: 0; overflow: visible; position: relative; border: 1.5px solid rgba(255,255,255,0.15); }
 .table-header { display: grid; grid-template-columns: 70px 1fr 50px 70px 1fr; background: rgba(0,0,0,0.3); padding: 10px 16px; font-size: 13px; font-weight: 700; color: #ccc; border-radius: 8px 8px 0 0; }
 .th-blue { color: #6ab0ff; display: flex; align-items: center; gap: 6px; }
 .th-blue::before { content: ''; width: 10px; height: 10px; background: #4a7fe8; border-radius: 50%; display: inline-block; }
 .th-red { color: #ff6a6a; display: flex; align-items: center; gap: 6px; }
 .th-red::before { content: ''; width: 10px; height: 10px; background: #e84a4a; border-radius: 50%; display: inline-block; }
+.mirror-header-blue { color: #ffffff; text-shadow: none; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; }
+.mirror-header-blue::before { content: ''; width: 9px; height: 9px; background: #ffffff; border-radius: 50%; display: inline-block; flex-shrink:0; box-shadow: none; }
+.mirror-header-red { color: #ffffff; text-shadow: none; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; }
+.mirror-header-red::before { content: ''; width: 9px; height: 9px; background: #ffffff; border-radius: 50%; display: inline-block; flex-shrink:0; box-shadow: none; }
+.mirror-blue .mirror-header::before { content: ''; width: 9px; height: 9px; background: #a8d4ff; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 6px #4a9fff, 0 0 12px rgba(58,143,255,0.8); flex-shrink:0; }
+.mirror-red .mirror-header::before { content: ''; width: 9px; height: 9px; background: #ffaaaa; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 6px #ff5555, 0 0 12px rgba(255,68,68,0.8); flex-shrink:0; }
 .th-vs { text-align: center; color: #aaa; }
 .avg-tier { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-left: 6px; }
 
@@ -248,7 +309,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .drag-cell-red.drag-over  { outline-color: #e84a4a; background: rgba(232,74,74,0.2); }
 .drag-cell-red { justify-content: flex-start; }
 
-.pos-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; color: white; text-align: center; min-width: 46px; cursor: pointer; }
+.pos-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; color: white; text-align: center; min-width: 46px; cursor: pointer; border: 1.5px solid rgba(255,255,255,0.4); }
 .pos-top    { background: #7b3a9e; }
 .pos-jungle { background: #2a7a3a; }
 .pos-mid    { background: #d4aa00; color: #fff; }
@@ -299,16 +360,17 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 /* PLAYER DB */
 .playerdb-wrap { padding: 16px; }
 .playerdb-add-box {
-  background: rgba(170,195,230,0.45); border: 1px solid rgba(255,255,255,0.45);
+  background: rgba(30,30,60,0.85); border: 1.5px solid rgba(255,255,255,0.15);
   border-radius: 8px; padding: 10px 16px; margin-bottom: 14px;
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
 .playerdb-add-box input {
-  flex: 1; min-width: 260px; padding: 7px 12px; border-radius: 6px;
-  border: 1px solid rgba(100,100,180,0.35); background: rgba(255,255,255,0.8);
-  font-size: 13px; color: #333; outline: none; font-family: inherit;
+  flex: 1; min-width: 260px; padding: 7px 14px; border-radius: 6px;
+  border: 1.5px solid rgba(74,127,232,0.5); background: rgba(20,25,50,0.9);
+  font-size: 13px; color: #e0e8ff; outline: none; font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.playerdb-add-box input::placeholder { color: #aaa; }
+.playerdb-add-box input::placeholder { color: rgba(150,160,200,0.6); }
 .playerdb-grid { display: flex; flex-direction: column; gap: 6px; }
 .player-card {
   background: rgba(30,30,60,0.88); border-radius: 8px;
@@ -358,53 +420,68 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 
 /* 참가자 목록 확인용 */
 .roster-box {
-  background: rgba(170,195,230,0.55);
-  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(30,30,60,0.85);
+  border: 1.5px solid rgba(255,255,255,0.15);
   border-radius: 8px;
 }
 .roster-box-title {
-  font-size: 13px; font-weight: 700; color: #2a2a5a;
+  font-size: 13px; font-weight: 700; color: #ccc;
   padding: 8px 14px 6px;
 }
 .roster-teams {
   display: grid; grid-template-columns: 1fr 1fr;
   padding: 0 14px 10px;
 }
-.roster-team-blue { border-right: 1px solid rgba(255,255,255,0.4); padding-right: 14px; }
+.roster-team-blue { border-right: 1px solid rgba(255,255,255,0.15); padding-right: 14px; }
 .roster-team-red  { padding-left: 14px; }
 .roster-team-header {
   font-size: 12px; font-weight: 700; margin-bottom: 6px;
   display: flex; align-items: center; gap: 6px;
 }
-.roster-team-header.blue { color: #2a5aaa; }
-.roster-team-header.red  { color: #aa2a2a; }
+.roster-team-header.blue { color: #6ab0ff; }
+.roster-team-header.red  { color: #ff6a6a; }
 .roster-team-header.blue::before { content:''; width:8px; height:8px; border-radius:50%; background:#4a7fe8; display:inline-block; }
 .roster-team-header.red::before  { content:''; width:8px; height:8px; border-radius:50%; background:#e84a4a; display:inline-block; }
 .roster-row {
   display: flex; align-items: center; gap: 8px;
-  padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.25);
+  padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 .roster-row:last-child { border-bottom: none; }
-.roster-chzz  { font-size: 13px; color: #1a1a4a; font-weight: 600; }
-.roster-empty { font-size: 12px; color: rgba(0,0,0,0.25); font-style: italic; }
+.roster-chzz  { font-size: 13px; color: #e0e0ff; font-weight: 600; }
+.roster-empty { font-size: 12px; color: rgba(255,255,255,0.7); font-style: italic; }
 
 /* 승패 기록 버튼 */
 .team-section-wrap { border-radius: 8px; overflow: hidden; }
 .mirror-teams { display: flex; gap: 12px; width: 100%; }
 .mirror-box {
   flex: 1; min-width: 0;
-  background: rgba(30,30,60,0.85);
   border-radius: 8px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
+}
+.mirror-blue {
+  background: rgba(74,110,200,0.75);
+  border: 1.5px solid #3a8fff;
+  box-shadow: 0 0 14px rgba(58,143,255,0.7), 0 0 35px rgba(58,143,255,0.3);
+}
+.mirror-red {
+  background: rgba(200,60,60,0.75);
+  border: 1.5px solid #ff4444;
+  box-shadow: 0 0 14px rgba(255,68,68,0.7), 0 0 35px rgba(255,68,68,0.3);
 }
 .mirror-header {
   padding: 10px 16px; font-size: 13px; font-weight: 700;
-  background: rgba(0,0,0,0.3);
   display: flex; align-items: center;
+}
+.mirror-blue .mirror-header {
+  background: #417aea;
+  border-bottom: 1px solid rgba(58,143,255,0.3);
+}
+.mirror-red .mirror-header {
+  background: #d6485d;
+  border-bottom: 1px solid rgba(255,68,68,0.3);
 }
 .mirror-row {
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 16px; border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 9px 16px; border-top: 1px solid rgba(255,255,255,0.05);
 }
 .mirror-empty { color: rgba(255,255,255,0.2); font-size: 12px; font-style: italic; }
 .trash-area {
@@ -430,36 +507,36 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .record-red-area  { grid-column: 5; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
 .btn-win {
   padding: 4px 16px; border-radius: 4px;
-  border: 1px solid rgba(74,127,232,0.45);
-  background: rgba(74,127,232,0.18); color: #6ab0ff;
+  border: 1px solid #4a7fe8;
+  background: #4a7fe8; color: #ffffff;
   font-size: 12px; font-weight: 700; cursor: pointer;
   transition: background 0.15s, transform 0.1s;
   white-space: nowrap; font-family: inherit;
 }
-.btn-win:hover { background: rgba(74,127,232,0.38); border-color: rgba(74,127,232,0.7); }
+.btn-win:hover { background: #3a6fd8; border-color: #3a6fd8; }
 .btn-win:active { transform: scale(0.96); }
 .btn-lose {
   padding: 4px 16px; border-radius: 4px;
-  border: 1px solid rgba(232,74,74,0.45);
-  background: rgba(232,74,74,0.18); color: #ff6a6a;
+  border: 1px solid #e84a4a;
+  background: #e84a4a; color: #ffffff;
   font-size: 12px; font-weight: 700; cursor: pointer;
   transition: background 0.15s, transform 0.1s;
   white-space: nowrap; font-family: inherit;
 }
-.btn-lose:hover { background: rgba(232,74,74,0.38); border-color: rgba(232,74,74,0.7); }
+.btn-lose:hover { background: #d03a3a; border-color: #d03a3a; }
 .btn-lose:active { transform: scale(0.96); }
 
 /* ───── FEARLESS DRAFT ───── */
 .fearless-wrap { display: flex; flex-direction: column; gap: 10px; }
 .fearless-controls {
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(170,195,230,0.55); border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(30,30,60,0.85); border: 1.5px solid rgba(255,255,255,0.15);
   border-radius: 8px; padding: 10px 16px; flex-wrap: wrap; gap: 10px;
 }
 .fearless-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.fearless-game-label { font-size: 13px; color: #2a2a5a; font-weight: 600; }
+.fearless-game-label { font-size: 13px; color: #c0c8f0; font-weight: 600; }
 .fearless-game-num { font-size: 18px; font-weight: 900; color: #2a2a5a; }
-.fearless-desc { font-size: 12px; color: #4a4a8a; }
+.fearless-desc { font-size: 12px; color: #7ac0ff; }
 .fearless-btns { display: flex; gap: 8px; }
 .fearless-game-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .fg-tab { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); background: rgba(30,30,60,0.6); color: #aaa; transition: all 0.15s; }
@@ -495,8 +572,8 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 .fd-vs { font-size: 20px; font-weight: 900; color: #555; }
 .fearless-game-label-bar {
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(170,195,230,0.35); border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 700; color: #2a2a5a;
+  background: rgba(30,30,60,0.85); border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 700; color: #c0c8f0;
 }
 .fd-input-area {
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
@@ -704,7 +781,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 
     <!-- 참가자 목록 확인용 (독립 박스) -->
     <div class="roster-box">
-      <div class="roster-box-title">참가자 목록 확인용 <span style="font-size:11px;font-weight:400;color:#4a4a8a;">(치지직 닉네임)</span></div>
+      <div class="roster-box-title">참가자 목록 확인용 <span style="font-size:11px;font-weight:400;color:#888;">(치지직 닉네임)</span></div>
       <div class="roster-teams">
         <div class="roster-team roster-team-blue" id="rosterBlue"></div>
         <div class="roster-team roster-team-red"  id="rosterRed"></div>
@@ -713,20 +790,26 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 
     <!-- 팀 박스 2 - 미러링, 분리 박스 -->
     <div class="mirror-teams">
-      <div class="mirror-box mirror-blue">
-        <div class="mirror-header th-blue">BLUE TEAM <span class="avg-tier" id="mirrorBlueAvg" style="margin-left:auto;"></span></div>
+      <div class="mirror-box mirror-blue" id="mirrorBoxBlue" style="position:relative;">
+        <div class="mirror-header mirror-header-blue">BLUE TEAM <span class="avg-tier" id="mirrorBlueAvg" style="margin-left:auto;"></span></div>
         <div id="mirrorBlue"></div>
-        <div class="mirror-btns">
+        <div class="mirror-btns" id="mirrorBtnsBlue">
           <button class="btn-win"  onclick="recordResult('blue','win')">승리</button>
           <button class="btn-lose" onclick="recordResult('blue','lose')">패배</button>
         </div>
+        <div id="mirrorOverlayBlue" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);border-radius:8px;align-items:center;justify-content:center;z-index:10;">
+          <button onclick="undoRecord('blue')" style="padding:10px 28px;border-radius:8px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.5);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.2s;">수정</button>
+        </div>
       </div>
-      <div class="mirror-box mirror-red">
-        <div class="mirror-header th-red">RED TEAM <span class="avg-tier" id="mirrorRedAvg" style="margin-left:auto;"></span></div>
+      <div class="mirror-box mirror-red" id="mirrorBoxRed" style="position:relative;">
+        <div class="mirror-header mirror-header-red">RED TEAM <span class="avg-tier" id="mirrorRedAvg" style="margin-left:auto;"></span></div>
         <div id="mirrorRed"></div>
-        <div class="mirror-btns">
+        <div class="mirror-btns" id="mirrorBtnsRed">
           <button class="btn-win"  onclick="recordResult('red','win')">승리</button>
           <button class="btn-lose" onclick="recordResult('red','lose')">패배</button>
+        </div>
+        <div id="mirrorOverlayRed" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);border-radius:8px;align-items:center;justify-content:center;z-index:10;">
+          <button onclick="undoRecord('red')" style="padding:10px 28px;border-radius:8px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.5);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.2s;">수정</button>
         </div>
       </div>
     </div>
@@ -743,7 +826,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
       <div class="fearless-controls">
         <div class="fearless-info">
           <span class="fearless-game-label">FEARLESS DRAFT</span>
-          <span class="fearless-desc">이전 경기에서 픽한 챔피언은 해당 팀이 다시 픽할 수 없습니다. (최대 5경기)</span>
+          <span class="fearless-desc">이전 경기에서 픽한 챔피언은 해당 매치 내내 픽할 수 없습니다. (최대 5경기)</span>
         </div>
         <div class="fearless-btns">
           <button class="btn btn-auto" onclick="fearlessNextGame()" id="fearlessNextBtn">다음 경기 →</button>
@@ -825,6 +908,16 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
       </div>
     </div>
 
+    <!-- 날짜 검색 -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="text" id="recDateSearch" placeholder="날짜 검색 (예: 2026.04.22)"
+        oninput="renderRecords()"
+        style="padding:7px 14px;border-radius:6px;border:1.5px solid rgba(74,127,232,0.5);background:rgba(20,25,50,0.9);color:#e0e8ff;font-size:13px;outline:none;font-family:inherit;width:220px;"/>
+      <button onclick="document.getElementById('recDateSearch').value='';renderRecords();"
+        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(30,30,60,0.85);color:#aaa;font-size:13px;cursor:pointer;font-family:inherit;">초기화</button>
+      <span id="recSearchResult" style="font-size:12px;color:#888;"></span>
+    </div>
+
     <!-- 경기 기록 테이블 -->
     <div class="rec-table-wrap">
       <div class="rec-table-header">
@@ -846,10 +939,19 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 </div>
 <div id="tab-roster" class="tab-content">
   <div class="main-content">
+    <!-- 선수 검색 -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="text" id="rosterSearch" placeholder="치지직 닉네임 또는 롤닉네임#태그 검색"
+        oninput="renderRosterTab()"
+        style="padding:7px 14px;border-radius:6px;border:1.5px solid rgba(74,127,232,0.5);background:rgba(20,25,50,0.9);color:#e0e8ff;font-size:13px;outline:none;font-family:inherit;width:280px;"/>
+      <button onclick="document.getElementById('rosterSearch').value='';renderRosterTab();"
+        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(30,30,60,0.85);color:#aaa;font-size:13px;cursor:pointer;font-family:inherit;">초기화</button>
+      <span id="rosterSearchResult" style="font-size:12px;color:#888;"></span>
+    </div>
     <div class="roster-table-wrap">
       <div class="roster-table-header">
         <div>No.</div>
-        <div>치지직 닉네임</div>
+        <div>선수 정보</div>
         <div>총 게임</div>
         <div>승리</div>
         <div>패배</div>
@@ -953,6 +1055,20 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: li
 </div>
 
 <script>
+
+function showToast(msg) {
+  let el = document.getElementById('toastMsg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toastMsg';
+    el.style.cssText = 'position:fixed;bottom:24px;left:24px;background:rgba(30,30,60,0.95);border:1.5px solid rgba(74,127,232,0.5);color:#c0c8f0;font-size:13px;font-weight:600;padding:10px 18px;border-radius:8px;z-index:99999;pointer-events:none;transition:opacity 0.4s;opacity:0;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.opacity = '0'; }, 1500);
+}
 const POS_LIST  = ['탑','정글','미드','원딜','서포터','all'];
 const POS_CLASS = ['pos-top','pos-jungle','pos-mid','pos-bottom','pos-support','pos-all'];
 
@@ -996,7 +1112,7 @@ function getTierPts(t) {
     return [0, 280, 256, 243, 230][n] || 230;
   }
   // 플레티넘: 190~230 (4=190, 3=203, 2=216, 1=230)
-  if (t.includes('플레') || t.includes('플래')) {
+  if (t.includes('플레') || t.includes('플래') || t.includes('프레') || t.includes('프래')) {
     const n = +(t.match(/\d/) || [4])[0];
     return [0, 230, 216, 203, 190][n] || 190;
   }
@@ -1037,7 +1153,7 @@ function getTierClass(t) {
   if (t.includes('마스터'))       return 'tier-m';
   if (t.includes('다이아'))       return 'tier-d';
   if (t.includes('에메'))         return 'tier-e';
-  if (t.includes('플레')||t.includes('플래')) return 'tier-p';
+  if (t.includes('플레')||t.includes('플래')||t.includes('프레')||t.includes('프래')) return 'tier-p';
   if (t.includes('골드'))         return 'tier-g';
   if (t.includes('실버'))         return 'tier-s';
   if (t.includes('브론즈'))       return 'tier-b';
@@ -1120,7 +1236,33 @@ function onTeamSizeChange() {
   renderTable();
 }
 
-function resetParticipants(){if(confirm('참가자를 모두 초기화할까요?')){blueTeam=[];redTeam=[];renderTable();}}
+function resetParticipants(){
+  if(confirm('참가자를 모두 초기화할까요?')){
+    blueTeam=[];
+    redTeam=[];
+
+    // 오버레이 숨기기
+    ['Blue','Red'].forEach(t => {
+      const ov = document.getElementById('mirrorOverlay' + t);
+      if (ov) ov.style.display = 'none';
+    });
+
+    // 챔피언 입력칸 초기화 + 활성화
+    document.querySelectorAll('.champ-input').forEach(inp => {
+      inp.value = '';
+      inp.disabled = false;
+      inp.style.opacity = '1';
+    });
+
+    // 빠른추가 검색창 초기화
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    const dropdown = document.getElementById('searchDropdown');
+    if (dropdown) dropdown.classList.remove('show');
+
+    renderTable();
+  }
+}
 function filterTeam(t){alert(t.toUpperCase()+' TEAM 필터');}
 
 // ─── 팀 교체 ───
@@ -1519,25 +1661,68 @@ function dbAddPlayer() {
   if (!raw) return;
   const parts = raw.split('/').map(s => s.trim());
   if (parts.length < 4) {
-    alert('입력 양식:\n치지직닉 / 롤닉#태그 / 티어 / 주포지션 / 부포지션');
+    showDbError('입력 양식:\n치지직닉 / 롤닉#태그 / 티어 / 주포지션 / 부포지션');
     return;
   }
   const [chzz, lol, rawTier, mainPosStr, ...subRaw] = parts;
   const tier = normalizeTier(rawTier);
   const subStr = subRaw.join('/');
-  if (!lol.includes('#')) {
-    alert('롤 닉네임은 닉네임#태그 형식으로 입력해주세요.');
+
+  // 오타 검증
+  const errors = [];
+
+  // 롤 닉네임 검증
+  if (!lol.includes('#')) errors.push('롤 닉네임은 닉네임#태그 형식이어야 합니다.');
+
+  // 티어 검증
+  const validTiers = ['브론즈','실버','골드','플레티넘','에메랄드','다이아','마스터','그랜드마스터','챌린저'];
+  const tierValid = validTiers.some(v => tier.includes(v));
+  if (!tierValid) errors.push(`티어 "${rawTier}"를 확인해주세요.\n(브론즈/실버/골드/플레티넘/에메랄드/다이아/마스터/그랜드마스터/챌린저)`);
+
+  // 주포지션 검증
+  const validPos = ['탑','정글','미드','원딜','바텀','서포터','서포트','all'];
+  if (!validPos.includes(mainPosStr)) errors.push(`주포지션 "${mainPosStr}"을 확인해주세요.\n(탑/정글/미드/원딜/서포터)`);
+
+  // 부포지션 검증
+  if (subStr) {
+    subStr.split(',').map(s=>s.trim()).forEach(s => {
+      if (s && !validPos.includes(s)) errors.push(`부포지션 "${s}"을 확인해주세요.\n(탑/정글/미드/원딜/서포터)`);
+    });
+  }
+
+  if (errors.length > 0) {
+    showDbError('잘못된 정보가 있습니다. 확인해주세요\n\n' + errors.join('\n'));
     return;
   }
+
   const mainPos = getPosIndex(mainPosStr);
   const subPos  = subStr ? subStr.split(',').map(s => getPosIndex(s.trim())).slice(0, 3) : [];
   const exists  = playerDB.findIndex(p => p.lol.toLowerCase() === lol.toLowerCase());
-  if (exists !== -1) { alert('이미 등록된 선수예요.'); return; }
+  if (exists !== -1) { showDbError('이미 등록된 선수예요.'); return; }
   playerDB.push({ chzz, lol, tier, mainPos, subPos, mainChamps: [], subChamps: {}, wins: 0, loses: 0, note: '', warnings: 0 });
   const newIdx = playerDB.length - 1;
   if(window.fbSavePlayer) window.fbSavePlayer(newIdx);
   renderPlayerDB();
   input.value = '';
+  hideDbError();
+}
+
+function showDbError(msg) {
+  let el = document.getElementById('dbErrorMsg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'dbErrorMsg';
+    el.style.cssText = 'margin-top:8px;padding:10px 14px;border-radius:6px;background:rgba(232,74,74,0.15);border:1.5px solid rgba(232,74,74,0.5);color:#ff8a8a;font-size:12px;font-weight:600;white-space:pre-line;line-height:1.7;';
+    const box = document.querySelector('.playerdb-add-box');
+    if (box) box.insertAdjacentElement('afterend', el);
+  }
+  el.style.display = 'block';
+  el.textContent = msg;
+}
+
+function hideDbError() {
+  const el = document.getElementById('dbErrorMsg');
+  if (el) el.style.display = 'none';
 }
 
 function openEditModal(idx) {
@@ -1690,6 +1875,14 @@ function getStreakInfo(chzz) {
   );
   if (!games.length) return { streak: 0, type: 'none' };
 
+  // playerDB의 실제 총 게임 수와 matchRecords 수 비교
+  const dbPlayer = playerDB.find(p => p.chzz === chzz);
+  if (dbPlayer) {
+    const dbTotal = (dbPlayer.wins || 0) + (dbPlayer.loses || 0);
+    // matchRecords 수가 실제 게임 수보다 많으면 오래된 잘못된 데이터 → 연승 표시 안 함
+    if (games.length > dbTotal) return { streak: 0, type: 'none' };
+  }
+
   // 가장 최근 경기부터 연속 체크
   let streak = 0;
   let streakType = 'none';
@@ -1708,6 +1901,59 @@ function getStreakInfo(chzz) {
   return { streak, type: streakType };
 }
 
+
+function showChampInfo(idx) {
+  const p = playerDB[idx];
+  if (!p) return;
+  const champHistory = p.champHistory || {};
+  const POS_NAMES = ['탑','정글','미드','원딜','서포터','all'];
+  const POS_CLASSES = ['pos-top','pos-jungle','pos-mid','pos-bottom','pos-support','pos-all'];
+
+  let html = `<div style="background:rgba(10,12,30,0.97);border:1.5px solid rgba(74,127,232,0.4);border-radius:12px;padding:20px;min-width:300px;max-width:420px;color:white;position:relative;">
+    <button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;">✕</button>
+    <div style="font-size:15px;font-weight:700;color:#6ab0ff;margin-bottom:4px;">${p.chzz}</div>
+    <div style="font-size:11px;color:#888;margin-bottom:14px;">${p.lol}</div>`;
+
+  const hasChampsHistory = Object.keys(champHistory).length > 0;
+  if (!hasChampsHistory) {
+    html += `<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:20px 0;">기록된 챔피언 정보가 없어요.</div>`;
+  } else {
+    Object.keys(champHistory).forEach(pos => {
+      const posNum = parseInt(pos);
+      const posName = POS_NAMES[posNum] || pos;
+      const posClass = POS_CLASSES[posNum] || 'pos-top';
+      const champs = champHistory[pos];
+      html += `<div style="margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <span class="pos-badge ${posClass}" style="font-size:10px;padding:1px 6px;">${posName}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">`;
+      Object.entries(champs).sort((a,b)=>(b[1].wins+b[1].loses)-(a[1].wins+a[1].loses)).forEach(([champ, rec]) => {
+        const total = rec.wins + rec.loses;
+        const rate = total ? Math.round((rec.wins/total)*100) : 0;
+        const barColor = rate >= 60 ? '#6ab0ff' : rate >= 50 ? '#60e090' : '#ff6a6a';
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:rgba(255,255,255,0.04);border-radius:5px;border:1px solid rgba(255,255,255,0.07);">
+          <span style="flex:1;font-size:12px;font-weight:600;">${champ}</span>
+          <span style="font-size:11px;color:#aaa;">${rec.wins}승 ${rec.loses}패</span>
+          <span style="font-size:12px;font-weight:700;color:${barColor};min-width:36px;text-align:right;">${rate}%</span>
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+  }
+  html += `</div>`;
+
+  // 기존 팝업 제거
+  const existing = document.getElementById('champInfoPopup');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'champInfoPopup';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;';
+  overlay.innerHTML = html;
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
 function renderRosterTab() {
   const body = document.getElementById('rosterTableBody');
   if (!body) return;
@@ -1716,13 +1962,31 @@ function renderRosterTab() {
     return;
   }
 
-  // 승률 내림차순 정렬
+  const searchVal = (document.getElementById('rosterSearch')?.value || '').trim().toLowerCase();
+
+  // 검색 필터 + 승률 내림차순 정렬
   const sorted = [...playerDB].map((p, origIdx) => ({...p, origIdx}))
+    .filter(p => {
+      if (!searchVal) return true;
+      return p.chzz.toLowerCase().includes(searchVal) || p.lol.toLowerCase().includes(searchVal);
+    })
     .sort((a, b) => {
       const rateA = (a.wins + a.loses) ? a.wins / (a.wins + a.loses) : 0;
       const rateB = (b.wins + b.loses) ? b.wins / (b.wins + b.loses) : 0;
       return rateB - rateA;
     });
+
+  const resEl = document.getElementById('rosterSearchResult');
+  if (resEl) {
+    if (searchVal) resEl.textContent = `"${searchVal}" 검색 결과: ${sorted.length}명`;
+    else resEl.textContent = '';
+  }
+
+  if (!sorted.length) {
+    const sv = (document.getElementById('rosterSearch')?.value||'').trim();
+    body.innerHTML = `<div class="rec-empty">"${sv}" 검색 결과가 없습니다.</div>`;
+    return;
+  }
 
   body.innerHTML = sorted.map((p, i) => {
     const total = p.wins + p.loses;
@@ -1737,7 +2001,11 @@ function renderRosterTab() {
 
     return `<div class="roster-r">
       <div>${i + 1}</div>
-      <div><span class="roster-chzz-name">${p.chzz}</span></div>
+      <div style="cursor:pointer;" onclick="showChampInfo(${p.origIdx})">
+        <span class="roster-chzz-name">${p.chzz}</span>
+        <span style="color:rgba(255,255,255,0.3);margin:0 6px;">/</span>
+        <span style="font-size:13px;color:#a0b8e0;font-weight:600;">${p.lol}</span>
+      </div>
       <div>${total}</div>
       <div class="roster-wins">${p.wins}</div>
       <div class="roster-loses">${p.loses}</div>
@@ -1752,7 +2020,7 @@ function renderRosterTab() {
 // ═══════════════════════════════
 let matchRecords = [];
 
-function addMatchRecord(winner) {
+function addMatchRecord(team, result) {
   const now = new Date();
   const date = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
   const bluePts = blueTeam.filter(p=>p).reduce((s,p)=>s+p.pts,0);
@@ -1765,6 +2033,8 @@ function addMatchRecord(winner) {
     const db = p.dbIdx>=0?playerDB[p.dbIdx]:null;
     return db?db.chzz:p.name;
   });
+  // winner: 블루가 이기면 'blue', 레드가 이기면 'red'
+  const winner = (team === 'blue' && result === 'win') || (team === 'red' && result === 'lose') ? 'blue' : 'red';
   matchRecords.unshift({ date, blueNames, redNames, bluePts, redPts, winner });
   if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
   renderRecords();
@@ -1778,10 +2048,22 @@ function deleteRecord(idx) {
 }
 
 function renderRecords() {
+  const searchEl = document.getElementById('recDateSearch');
+  const keyword = searchEl ? searchEl.value.trim() : '';
+  const filtered = keyword
+    ? matchRecords.filter(r => r.date && r.date.includes(keyword))
+    : matchRecords;
+
   const total = matchRecords.length;
   const blueW = matchRecords.filter(r=>r.winner==='blue').length;
   const redW  = matchRecords.filter(r=>r.winner==='red').length;
   const avgDiff = total ? Math.round(matchRecords.reduce((s,r)=>s+Math.abs(r.bluePts-r.redPts),0)/total) : 0;
+
+  const resEl = document.getElementById('recSearchResult');
+  if (resEl) {
+    if (keyword) resEl.textContent = `"${keyword}" 검색 결과: ${filtered.length}경기`;
+    else resEl.textContent = '';
+  }
 
   const tg = document.getElementById('recTotalGames');
   const bw = document.getElementById('recBlueWins');
@@ -1794,11 +2076,13 @@ function renderRecords() {
 
   const body = document.getElementById('recTableBody');
   if (!body) return;
-  if (!total) {
-    body.innerHTML = '<div class="rec-empty">아직 기록된 경기가 없습니다.</div>';
+  if (!filtered.length) {
+    body.innerHTML = keyword
+      ? `<div class="rec-empty">"${keyword}" 날짜의 경기 기록이 없습니다.</div>`
+      : '<div class="rec-empty">아직 기록된 경기가 없습니다.</div>';
     return;
   }
-  body.innerHTML = matchRecords.map((r, i) => {
+  body.innerHTML = filtered.map((r, i) => {
     const diff = Math.abs(r.bluePts - r.redPts);
     const winLabel = r.winner === 'blue'
       ? '<span class="blue-win">🔵 블루</span>'
@@ -2171,7 +2455,7 @@ function resetCoinGame() {
   const coin = document.getElementById('coinEl');
   const result = document.getElementById('coinResult');
   coin.className = 'coin';
-  coin.innerHTML = '<div class="coin-face coin-front">G</div><div class="coin-face coin-back">G</div>';
+  coin.innerHTML = '<div class="coin-face coin-front">Coin</div><div class="coin-face coin-back">Coin</div>';
   result.textContent = '';
   result.className = 'coin-result';
   document.querySelectorAll('.coin-choice-btn').forEach(b => b.disabled = false);
@@ -2199,6 +2483,41 @@ function flipCoin(choice) {
 }
 
 // ─── 승패 기록 ───
+function undoRecord(team) {
+  const teamName = team === 'blue' ? 'BLUE TEAM' : 'RED TEAM';
+  const arr = team === 'blue' ? blueTeam : redTeam;
+  const teamCap = team.charAt(0).toUpperCase() + team.slice(1);
+  const overlay = document.getElementById('mirrorOverlay' + teamCap);
+  const prevResult = overlay ? overlay.dataset.result : null;
+
+  // 이전 승패 기록 되돌리기
+  arr.forEach(p => {
+    if (!p || p.dbIdx < 0 || !playerDB[p.dbIdx]) return;
+    if (prevResult === 'win')  playerDB[p.dbIdx].wins  = Math.max(0, playerDB[p.dbIdx].wins  - 1);
+    if (prevResult === 'lose') playerDB[p.dbIdx].loses = Math.max(0, playerDB[p.dbIdx].loses - 1);
+    if(window.fbSavePlayer) window.fbSavePlayer(p.dbIdx);
+  });
+
+  // matchRecords에서 최근 기록 제거 (승/패 모두)
+  if (matchRecords.length > 0) {
+    matchRecords.shift();
+    if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
+    renderRecords();
+  }
+
+  // 오버레이 숨기기
+  if (overlay) overlay.style.display = 'none';
+
+  // 챔피언 입력칸 다시 활성화
+  document.querySelectorAll(`.champ-input[data-team="${team}"]`).forEach(inp => {
+    inp.disabled = false;
+    inp.style.opacity = '1';
+  });
+
+  renderPlayerDB();
+  showToast(`🔄 ${teamName} 결과 취소 — 다시 입력해주세요`);
+}
+
 function recordResult(team, result) {
   const arr = team === 'blue' ? blueTeam : redTeam;
   const teamName   = team === 'blue' ? 'BLUE TEAM' : 'RED TEAM';
@@ -2209,7 +2528,15 @@ function recordResult(team, result) {
     return;
   }
 
-  arr.forEach(p => {
+  // 챔피언 입력값 미리 읽기
+  const champMap = {};
+  document.querySelectorAll(`.champ-input[data-team="${team}"]`).forEach(inp => {
+    const idx = parseInt(inp.dataset.idx);
+    const val = inp.value.trim();
+    if (val) champMap[idx] = val;
+  });
+
+  arr.forEach((p, i) => {
     if (!p) return;
 
     // DB에 없는 플레이어면 자동 등록
@@ -2218,15 +2545,10 @@ function recordResult(team, result) {
       if (existing >= 0) {
         p.dbIdx = existing;
       } else {
-        // 신규 등록
         playerDB.push({
-          chzz: p.name,
-          lol:  p.name,
-          tier: p.tier,
-          mainPos: p.pos,
-          subPos: [],
-          wins: 0,
-          loses: 0
+          chzz: p.name, lol: p.name, tier: p.tier,
+          mainPos: p.pos, subPos: [], mainChamps: [], subChamps: {},
+          wins: 0, loses: 0, note: '', warnings: 0
         });
         p.dbIdx = playerDB.length - 1;
       }
@@ -2235,18 +2557,39 @@ function recordResult(team, result) {
     // 승패 기록
     if (result === 'win')  playerDB[p.dbIdx].wins++;
     else                   playerDB[p.dbIdx].loses++;
+
+    // 챔피언 기록 저장
+    const champName = champMap[i];
+    if (champName) {
+      if (!playerDB[p.dbIdx].champHistory) playerDB[p.dbIdx].champHistory = {};
+      const pos = p.pos;
+      if (!playerDB[p.dbIdx].champHistory[pos]) playerDB[p.dbIdx].champHistory[pos] = {};
+      if (!playerDB[p.dbIdx].champHistory[pos][champName]) playerDB[p.dbIdx].champHistory[pos][champName] = {wins:0, loses:0};
+      if (result === 'win') playerDB[p.dbIdx].champHistory[pos][champName].wins++;
+      else playerDB[p.dbIdx].champHistory[pos][champName].loses++;
+    }
+
     if(window.fbSavePlayer) window.fbSavePlayer(p.dbIdx);
   });
 
-  // 확인 알림 - 기록된 플레이어 목록 표시
-  const names = arr.filter(p => p).map(p => {
-    const db = playerDB[p.dbIdx];
-    return db ? db.chzz : p.name;
-  }).join(', ');
-
-  alert(`✅ ${teamName} ${resultName} 기록 완료!\n\n기록된 플레이어:\n${names}`);
-  if (result === 'win') addMatchRecord(team);
+  addMatchRecord(team, result);
   renderPlayerDB();
+
+  // 오버레이 표시
+  const teamCap2 = team.charAt(0).toUpperCase() + team.slice(1);
+  const overlay2 = document.getElementById('mirrorOverlay' + teamCap2);
+  if (overlay2) {
+    overlay2.dataset.result = result;
+    overlay2.dataset.team = team;
+    overlay2.style.display = 'flex';
+  }
+  // 챔피언 입력칸 비활성화
+  document.querySelectorAll(`.champ-input[data-team="${team}"]`).forEach(inp => {
+    inp.disabled = true;
+    inp.style.opacity = '0.4';
+  });
+  const resultName2 = result === 'win' ? '승리' : '패배';
+  showToast(`✅ ${teamName} ${resultName2} 기록 완료!`);
 }
 
 // ─── 참가자 목록 렌더 ───
@@ -2286,10 +2629,10 @@ function renderMirror() {
   const redEl  = document.getElementById('mirrorRed');
   if (!blueEl || !redEl) return;
 
-  function makeRows(team) {
+  function makeRows(team, teamKey) {
     let html = '';
     const size = parseInt(document.getElementById('teamSize')?.value || 5);
-  const slots = Array(size).fill(null).map((_,i) => team[i] || null);
+    const slots = Array(size).fill(null).map((_,i) => team[i] || null);
     slots.forEach((p, i) => {
       html += `<div class="mirror-row">`;
       html += `<span class="pos-badge ${POS_CLASS[p ? p.pos : i]}" style="font-size:11px;padding:2px 7px;">${POS_LIST[p ? p.pos : i]}</span>`;
@@ -2297,6 +2640,9 @@ function renderMirror() {
         const db = p.dbIdx >= 0 ? playerDB[p.dbIdx] : null;
         html += `<span class="player-name" style="cursor:default;">${p.name}</span>`;
         html += `<span class="tier-badge ${getTierClass(p.tier)}">${p.tier}</span>`;
+        html += `<span style="flex:1;"></span>`;
+        html += `<input type="text" class="champ-input" placeholder="사용 챔피언" data-team="${teamKey}" data-idx="${i}"
+          style="width:110px;padding:3px 8px;border-radius:4px;border:1px solid rgba(74,127,232,0.4);background:rgba(20,25,50,0.9);color:#e0e8ff;font-size:11px;outline:none;font-family:inherit;" />`;
       } else {
         html += `<span class="mirror-empty">비어있음</span>`;
       }
@@ -2304,8 +2650,8 @@ function renderMirror() {
     });
     return html;
   }
-  blueEl.innerHTML = makeRows(blueTeam);
-  redEl.innerHTML  = makeRows(redTeam);
+  blueEl.innerHTML = makeRows(blueTeam, 'blue');
+  redEl.innerHTML  = makeRows(redTeam, 'red');
 
   const ba = document.getElementById('mirrorBlueAvg');
   const ra = document.getElementById('mirrorRedAvg');
