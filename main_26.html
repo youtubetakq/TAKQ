@@ -914,7 +914,9 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
         oninput="renderRecords()"
         style="padding:7px 14px;border-radius:6px;border:1.5px solid rgba(74,127,232,0.5);background:rgba(20,25,50,0.9);color:#e0e8ff;font-size:13px;outline:none;font-family:inherit;width:220px;"/>
       <button onclick="document.getElementById('recDateSearch').value='';renderRecords();"
-        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(30,30,60,0.85);color:#aaa;font-size:13px;cursor:pointer;font-family:inherit;">초기화</button>
+        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(30,30,60,0.85);color:#aaa;font-size:13px;cursor:pointer;font-family:inherit;">검색 초기화</button>
+      <button onclick="clearAllRecords()"
+        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(232,74,74,0.4);background:rgba(232,74,74,0.15);color:#ff6a6a;font-size:13px;cursor:pointer;font-family:inherit;">전체 기록 초기화</button>
       <span id="recSearchResult" style="font-size:12px;color:#888;"></span>
     </div>
 
@@ -2045,6 +2047,14 @@ function deleteRecord(idx) {
   matchRecords.splice(idx, 1);
   if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
   renderRecords();
+}
+
+function clearAllRecords() {
+  if (!confirm('모든 경기 기록을 초기화할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+  matchRecords = [];
+  if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
+  renderRecords();
+  showToast('✅ 모든 경기 기록이 초기화됐어요.');
 }
 
 function renderRecords() {
