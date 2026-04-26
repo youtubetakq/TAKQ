@@ -438,10 +438,29 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
   font-size: 12px; font-weight: 700; margin-bottom: 6px;
   display: flex; align-items: center; gap: 6px;
 }
+.roster-team-header { display:flex; align-items:center; gap:6px; }
 .roster-team-header.blue { color: #6ab0ff; }
 .roster-team-header.red  { color: #ff6a6a; }
 .roster-team-header.blue::before { content:''; width:8px; height:8px; border-radius:50%; background:#4a7fe8; display:inline-block; }
 .roster-team-header.red::before  { content:''; width:8px; height:8px; border-radius:50%; background:#e84a4a; display:inline-block; }
+.ready-btn {
+  margin-left:auto; padding:2px 10px; border-radius:4px; font-size:11px; font-weight:700;
+  border:1.5px solid rgba(100,200,100,0.4); background:rgba(60,160,60,0.15); color:#80e080;
+  cursor:pointer; font-family:inherit; transition:all 0.2s;
+}
+.ready-btn.active {
+  background:rgba(60,160,60,0.4); border-color:#60d060; color:#ffffff;
+  box-shadow: 0 0 8px rgba(60,200,60,0.5);
+}
+.mirror-disabled-overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,0.55);
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  z-index:5; pointer-events:none;
+}
+.mirror-disabled-overlay span {
+  color:rgba(255,255,255,0.7); font-size:14px; font-weight:700;
+  text-align:center; line-height:1.8; letter-spacing:0.5px;
+}
 .roster-row {
   display: flex; align-items: center; gap: 8px;
   padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -599,7 +618,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
 /* ───── ROSTER ───── */
 .roster-table-wrap { background: rgba(30,30,60,0.88); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
 .roster-table-header {
-  display: grid; grid-template-columns: 50px 1fr 90px 80px 80px 80px 120px;
+  display: grid; grid-template-columns: 30px 36px 1fr 70px 60px 60px 60px 110px;
   background: rgba(0,0,0,0.3); font-size: 13px; font-weight: 700; color: #aaa;
 }
 .roster-table-header > div, .roster-r > div {
@@ -609,7 +628,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
 }
 .roster-table-header > div:last-child, .roster-r > div:last-child { border-right: none; }
 .roster-r {
-  display: grid; grid-template-columns: 50px 1fr 90px 80px 80px 80px 120px;
+  display: grid; grid-template-columns: 30px 36px 1fr 70px 60px 60px 60px 110px;
   border-top: 1px solid rgba(255,255,255,0.06);
   font-size: 13px; color: #ddd; align-items: center; transition: background 0.15s;
 }
@@ -670,7 +689,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
 <div class="site-wrap">
 <nav class="navbar">
   <div class="nav-item active" onclick="switchTab('match',this)">📋 내전 등록</div>
-  <div class="nav-item" onclick="switchTab('autoset',this)">AUTO SET</div>
+  <div class="nav-item" onclick="switchTab('autoset',this)">TEAM MATCH LOBBY</div>
   <div class="nav-item" onclick="switchTab('fearless',this)">FEARLESS DRAFT</div>
   <div class="nav-item" onclick="switchTab('records',this)">RECORDS</div>
   <div class="nav-item" onclick="switchTab('roster',this)">ROSTER</div>
@@ -791,6 +810,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
     <!-- 팀 박스 2 - 미러링, 분리 박스 -->
     <div class="mirror-teams">
       <div class="mirror-box mirror-blue" id="mirrorBoxBlue" style="position:relative;">
+        <div id="mirrorDisabledBlue" class="mirror-disabled-overlay"><span>양팀이 준비되지<br>않았습니다!</span></div>
         <div class="mirror-header mirror-header-blue">BLUE TEAM <span class="avg-tier" id="mirrorBlueAvg" style="margin-left:auto;"></span></div>
         <div id="mirrorBlue"></div>
         <div class="mirror-btns" id="mirrorBtnsBlue">
@@ -802,6 +822,7 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
         </div>
       </div>
       <div class="mirror-box mirror-red" id="mirrorBoxRed" style="position:relative;">
+        <div id="mirrorDisabledRed" class="mirror-disabled-overlay"><span>양팀이 준비되지<br>않았습니다!</span></div>
         <div class="mirror-header mirror-header-red">RED TEAM <span class="avg-tier" id="mirrorRedAvg" style="margin-left:auto;"></span></div>
         <div id="mirrorRed"></div>
         <div class="mirror-btns" id="mirrorBtnsRed">
@@ -812,6 +833,21 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
           <button onclick="undoRecord('red')" style="padding:10px 28px;border-radius:8px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.5);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.2s;">수정</button>
         </div>
       </div>
+    </div>
+
+    <!-- 내전 시작 버튼 -->
+    <div style="display:flex;justify-content:center;margin-top:16px;">
+      <button onclick="openMatchScreen()" style="
+        padding:14px 60px;border-radius:10px;
+        background:linear-gradient(135deg,#4a7fe8,#a06ae8);
+        border:none;color:#fff;font-size:16px;font-weight:700;
+        cursor:pointer;font-family:inherit;letter-spacing:2px;
+        box-shadow:0 0 20px rgba(74,127,232,0.4);
+        transition:opacity 0.2s,transform 0.1s;
+      " onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'"
+         onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
+        내전 시작
+      </button>
     </div>
 
   </div>
@@ -941,17 +977,20 @@ body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #2
 </div>
 <div id="tab-roster" class="tab-content">
   <div class="main-content">
-    <!-- 선수 검색 -->
+    <!-- 선수 검색 + 선택 초기화 -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
       <input type="text" id="rosterSearch" placeholder="치지직 닉네임 또는 롤닉네임#태그 검색"
         oninput="renderRosterTab()"
         style="padding:7px 14px;border-radius:6px;border:1.5px solid rgba(74,127,232,0.5);background:rgba(20,25,50,0.9);color:#e0e8ff;font-size:13px;outline:none;font-family:inherit;width:280px;"/>
       <button onclick="document.getElementById('rosterSearch').value='';renderRosterTab();"
-        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(30,30,60,0.85);color:#aaa;font-size:13px;cursor:pointer;font-family:inherit;">초기화</button>
+        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(30,30,60,0.85);color:#aaa;font-size:13px;cursor:pointer;font-family:inherit;">검색 초기화</button>
+      <button onclick="resetSelectedPlayerRecords()"
+        style="padding:7px 14px;border-radius:6px;border:1px solid rgba(232,74,74,0.5);background:rgba(232,74,74,0.15);color:#ff7070;font-size:13px;cursor:pointer;font-family:inherit;">선택 기록 초기화</button>
       <span id="rosterSearchResult" style="font-size:12px;color:#888;"></span>
     </div>
     <div class="roster-table-wrap">
       <div class="roster-table-header">
+        <div><input type="checkbox" id="rosterCheckAll" onchange="toggleAllRosterCheck(this.checked)" style="cursor:pointer;accent-color:#4a7fe8;width:14px;height:14px;"></div>
         <div>No.</div>
         <div>선수 정보</div>
         <div>총 게임</div>
@@ -1071,6 +1110,9 @@ function showToast(msg) {
   clearTimeout(el._timer);
   el._timer = setTimeout(() => { el.style.opacity = '0'; }, 1500);
 }
+// READY 상태
+let readyState = { blue: false, red: false };
+
 const POS_LIST  = ['탑','정글','미드','원딜','서포터','all'];
 const POS_CLASS = ['pos-top','pos-jungle','pos-mid','pos-bottom','pos-support','pos-all'];
 
@@ -1243,6 +1285,12 @@ function resetParticipants(){
     blueTeam=[];
     redTeam=[];
 
+    // READY 상태 초기화
+    readyState = { blue: false, red: false };
+
+    // 경기 기록 플래그 초기화
+    matchRecordedThisRound = false;
+
     // 오버레이 숨기기
     ['Blue','Red'].forEach(t => {
       const ov = document.getElementById('mirrorOverlay' + t);
@@ -1408,8 +1456,26 @@ function closeAllPopups() {
 
 function changePos(e, team, idx, newPos) {
   e.stopPropagation();
-  if (team==='blue') blueTeam[idx].pos = newPos;
-  else redTeam[idx].pos = newPos;
+  const arr = team === 'blue' ? blueTeam : redTeam;
+  const player = arr[idx];
+  player.pos = newPos;
+
+  // DB에서 해당 포지션 티어 가져오기
+  if (player.dbIdx >= 0 && playerDB[player.dbIdx]) {
+    const db = playerDB[player.dbIdx];
+    if (newPos === db.mainPos) {
+      // 주포지션 → 원래 주포지션 티어 복원
+      player.tier = db.tier;
+      player.pts  = getTierPts(db.tier);
+    } else if (db.subPos.includes(newPos) && db.subTiers && db.subTiers[newPos]) {
+      // 부포지션 + 해당 포지션 티어 있으면 적용
+      const subTier = db.subTiers[newPos];
+      player.tier = subTier;
+      player.pts  = getTierPts(subTier);
+    }
+    // 부포지션인데 티어 미설정이면 주포지션 티어 유지
+  }
+
   closeAllPopups();
   renderTable();
 }
@@ -1473,21 +1539,13 @@ function onDrop(e, toTeam, toIdx) {
   if (!fromPlayer) return;
 
   if (fromTeam === toTeam) {
-    // 같은 팀 내 이동 - splice로 순서 변경
-    fromArr.splice(fromIdx, 1);         // 원래 위치에서 제거
-    const insertIdx = toIdx > fromIdx ? toIdx - 1 : toIdx;
-    fromArr.splice(insertIdx, 0, fromPlayer); // 목표 위치에 삽입
-    if (fromTeam === 'blue') blueTeam = fromArr;
-    else redTeam = fromArr;
+    // 같은 팀 내 이동 - 두 위치 스왑
+    fromArr[fromIdx] = toPlayer || null;
+    fromArr[toIdx]   = fromPlayer;
   } else {
     // 다른 팀 간 이동
-    if (toPlayer) {
-      fromArr[fromIdx] = toPlayer;
-      toArr[toIdx]     = fromPlayer;
-    } else {
-      fromArr.splice(fromIdx, 1);
-      toArr.push(fromPlayer);
-    }
+    fromArr[fromIdx] = toPlayer || null;
+    toArr[toIdx]     = fromPlayer;
   }
 
   renderTable();
@@ -1742,18 +1800,41 @@ function openEditModal(idx) {
   subFields.innerHTML = '';
   (p.subPos||[]).forEach(pos => {
     const champs = (p.subChamps||{})[pos]||[];
+    const subTiers = p.subTiers || {};
+
+    // 포지션 헤더 라벨
     const label = document.createElement('label');
-    label.style.cssText = 'font-size:12px;color:#aaa;display:block;margin-bottom:4px;margin-top:8px;';
-    label.innerHTML = `<span class="pos-badge ${POS_CLASS[pos]}" style="font-size:10px;padding:1px 6px;vertical-align:middle;">${POS_LIST[pos]}</span> 챔피언 <span style="font-size:10px;color:#777;">(콤마 구분, 최대 5개)</span>`;
+    label.style.cssText = 'font-size:12px;color:#aaa;display:block;margin-bottom:4px;margin-top:12px;';
+    label.innerHTML = `<span class="pos-badge ${POS_CLASS[pos]}" style="font-size:10px;padding:1px 6px;vertical-align:middle;">${POS_LIST[pos]}</span>`;
+    subFields.appendChild(label);
+
+    // 티어 입력칸
+    const tierRow = document.createElement('div');
+    tierRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:4px;';
+    tierRow.innerHTML = `<span style="font-size:11px;color:#888;min-width:60px;">티어</span>`;
+    const tierInput = document.createElement('input');
+    tierInput.type = 'text';
+    tierInput.id = 'subTier_' + pos;
+    tierInput.placeholder = '예: 골드 2';
+    tierInput.value = subTiers[pos] || '';
+    tierInput.style.cssText = 'flex:1;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-size:13px;outline:none;font-family:inherit;';
+    tierInput.onkeydown = (e) => { if(e.key==='Enter') saveEdit(); };
+    tierRow.appendChild(tierInput);
+    subFields.appendChild(tierRow);
+
+    // 챔피언 입력칸
+    const champRow = document.createElement('div');
+    champRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    champRow.innerHTML = `<span style="font-size:11px;color:#888;min-width:60px;">챔피언</span>`;
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'subChamps_' + pos;
-    input.placeholder = '챔피언, 챔피언, 챔피언...';
+    input.placeholder = '챔피언, 챔피언... (최대 5개)';
     input.value = champs.join(', ');
-    input.style.cssText = 'width:100%;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-size:13px;outline:none;font-family:inherit;';
+    input.style.cssText = 'flex:1;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-size:13px;outline:none;font-family:inherit;';
     input.onkeydown = (e) => { if(e.key==='Enter') saveEdit(); };
-    subFields.appendChild(label);
-    subFields.appendChild(input);
+    champRow.appendChild(input);
+    subFields.appendChild(champRow);
   });
   if((p.subPos||[]).length === 0) {
     subFields.innerHTML = '<p style="font-size:12px;color:#666;margin-top:4px;">부 포지션이 없습니다.</p>';
@@ -1768,13 +1849,17 @@ function saveEdit(){
   const subStr = document.getElementById('editSubPos').value;
   const newSubPos = subStr ? subStr.split(',').map(s=>getPosIndex(s.trim())).slice(0,3) : [];
 
-  // subChamps를 먼저 읽기 (playerDB 덮어쓰기 전에)
+  // subChamps, subTiers 먼저 읽기 (playerDB 덮어쓰기 전에)
   const subChampsObj = {};
+  const subTiersObj = {};
   newSubPos.forEach(pos => {
     const el = document.getElementById('subChamps_' + pos);
-    if (!el) return;
-    const champs = el.value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5);
-    if (champs.length) subChampsObj[pos] = champs;
+    if (el) {
+      const champs = el.value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5);
+      if (champs.length) subChampsObj[pos] = champs;
+    }
+    const te = document.getElementById('subTier_' + pos);
+    if (te && te.value.trim()) subTiersObj[pos] = te.value.trim();
   });
 
   playerDB[idx] = {
@@ -1789,6 +1874,8 @@ function saveEdit(){
     warnings: (document.getElementById('editWarn1').checked ? 1 : 0) + (document.getElementById('editWarn2').checked ? 1 : 0),
     mainChamps: document.getElementById('editMainChamps').value.split(',').map(s=>s.trim()).filter(s=>s).slice(0,5),
     subChamps: subChampsObj,
+    subTiers: subTiersObj,
+    champHistory: playerDB[idx].champHistory || {},
   };
 
   // Firebase 저장
@@ -1956,6 +2043,44 @@ function showChampInfo(idx) {
   overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
   document.body.appendChild(overlay);
 }
+
+function toggleAllRosterCheck(checked) {
+  document.querySelectorAll('.roster-check').forEach(cb => cb.checked = checked);
+}
+
+function resetSelectedPlayerRecords() {
+  const checked = document.querySelectorAll('.roster-check:checked');
+  if (checked.length === 0) { showToast('초기화할 선수를 선택해주세요.'); return; }
+  if (!confirm(`선택한 ${checked.length}명의 기록을 초기화할까요?\n(승리/패배/챔피언 히스토리가 모두 초기화됩니다)`)) return;
+
+  checked.forEach(cb => {
+    const idx = parseInt(cb.dataset.idx);
+    if (!playerDB[idx]) return;
+    playerDB[idx].wins = 0;
+    playerDB[idx].loses = 0;
+    playerDB[idx].champHistory = {};
+    if(window.fbSavePlayer) window.fbSavePlayer(idx);
+  });
+
+  // matchRecords에서도 해당 선수 기록 제거
+  const checkedNames = [...checked].map(cb => {
+    const idx = parseInt(cb.dataset.idx);
+    return playerDB[idx] ? playerDB[idx].chzz : null;
+  }).filter(Boolean);
+
+  matchRecords = matchRecords.filter(r => {
+    // 선택된 선수가 포함된 경기 제거
+    const blueHas = r.blueNames.some(n => checkedNames.includes(n));
+    const redHas  = r.redNames.some(n => checkedNames.includes(n));
+    return !blueHas && !redHas;
+  });
+  if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
+
+  renderRosterTab();
+  renderRecords();
+  showToast(`✅ ${checked.length}명의 기록이 초기화됐어요.`);
+}
+
 function renderRosterTab() {
   const body = document.getElementById('rosterTableBody');
   if (!body) return;
@@ -2002,6 +2127,7 @@ function renderRosterTab() {
     }
 
     return `<div class="roster-r">
+      <div><input type="checkbox" class="roster-check" data-idx="${p.origIdx}" style="cursor:pointer;accent-color:#4a7fe8;width:14px;height:14px;"></div>
       <div>${i + 1}</div>
       <div style="cursor:pointer;" onclick="showChampInfo(${p.origIdx})">
         <span class="roster-chzz-name">${p.chzz}</span>
@@ -2022,7 +2148,14 @@ function renderRosterTab() {
 // ═══════════════════════════════
 let matchRecords = [];
 
+// 현재 경기가 이미 기록됐는지 확인하는 플래그
+let matchRecordedThisRound = false;
+
 function addMatchRecord(team, result) {
+  // 이미 이번 경기에서 기록이 저장됐으면 중복 저장 방지
+  if (matchRecordedThisRound) return;
+  matchRecordedThisRound = true;
+
   const now = new Date();
   const date = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
   const bluePts = blueTeam.filter(p=>p).reduce((s,p)=>s+p.pts,0);
@@ -2035,9 +2168,26 @@ function addMatchRecord(team, result) {
     const db = p.dbIdx>=0?playerDB[p.dbIdx]:null;
     return db?db.chzz:p.name;
   });
-  // winner: 블루가 이기면 'blue', 레드가 이기면 'red'
+  // 챔피언 입력칸에서 챔피언 이름 수집
+  const blueChamps = {}, redChamps = {};
+  document.querySelectorAll('.champ-input[data-team="blue"]').forEach(inp => {
+    const idx = parseInt(inp.dataset.idx);
+    if (inp.value.trim() && blueTeam[idx]) {
+      const db = blueTeam[idx].dbIdx>=0?playerDB[blueTeam[idx].dbIdx]:null;
+      const chzz = db?db.chzz:blueTeam[idx].name;
+      blueChamps[chzz] = inp.value.trim();
+    }
+  });
+  document.querySelectorAll('.champ-input[data-team="red"]').forEach(inp => {
+    const idx = parseInt(inp.dataset.idx);
+    if (inp.value.trim() && redTeam[idx]) {
+      const db = redTeam[idx].dbIdx>=0?playerDB[redTeam[idx].dbIdx]:null;
+      const chzz = db?db.chzz:redTeam[idx].name;
+      redChamps[chzz] = inp.value.trim();
+    }
+  });
   const winner = (team === 'blue' && result === 'win') || (team === 'red' && result === 'lose') ? 'blue' : 'red';
-  matchRecords.unshift({ date, blueNames, redNames, bluePts, redPts, winner });
+  matchRecords.unshift({ date, blueNames, redNames, bluePts, redPts, winner, blueChamps, redChamps });
   if(window.fbSaveMatchRecords) window.fbSaveMatchRecords();
   renderRecords();
 }
@@ -2518,6 +2668,9 @@ function undoRecord(team) {
   // 오버레이 숨기기
   if (overlay) overlay.style.display = 'none';
 
+  // 경기 기록 플래그 초기화 (수정 후 다시 기록 가능하게)
+  matchRecordedThisRound = false;
+
   // 챔피언 입력칸 다시 활성화
   document.querySelectorAll(`.champ-input[data-team="${team}"]`).forEach(inp => {
     inp.disabled = false;
@@ -2584,8 +2737,6 @@ function recordResult(team, result) {
 
   addMatchRecord(team, result);
   renderPlayerDB();
-
-  // 오버레이 표시
   const teamCap2 = team.charAt(0).toUpperCase() + team.slice(1);
   const overlay2 = document.getElementById('mirrorOverlay' + teamCap2);
   if (overlay2) {
@@ -2609,18 +2760,25 @@ function renderRoster() {
   if (!blueEl || !redEl) return;
 
   function makeRows(team, color) {
-    let html = `<div class="roster-team-header ${color}">${color === 'blue' ? 'BLUE TEAM' : 'RED TEAM'}</div>`;
+    const isReady = readyState[color];
+    const teamLabel = color === 'blue' ? 'BLUE TEAM' : 'RED TEAM';
+    let html = `<div class="roster-team-header ${color}">
+      ${teamLabel}
+      <button class="ready-btn ${isReady ? 'active' : ''}" onclick="toggleReady('${color}')">
+        ${isReady ? '✓ READY' : 'READY'}
+      </button>
+    </div>`;
     const size = parseInt(document.getElementById('teamSize')?.value || 5);
     const slots = Array(size).fill(null).map((_, i) => team[i] || null);
     slots.forEach((p, i) => {
       html += `<div class="roster-row">`;
       html += `<span class="pos-badge ${POS_CLASS[p ? p.pos : i]}" style="font-size:11px;padding:2px 7px;">${POS_LIST[p ? p.pos : i]}</span>`;
       if (p) {
-        // 치지직 닉네임 찾기
         const db = p.dbIdx >= 0 ? playerDB[p.dbIdx] : null;
         const chzz = db ? db.chzz : p.name;
         const warns = db ? (db.warnings||0) : 0;
-        html += `<span class="roster-chzz">${chzz}</span>${warningDot(warns)}`;
+        const nameColor = isReady ? 'color:rgba(150,150,150,0.7);' : '';
+        html += `<span class="roster-chzz" style="${nameColor}">${chzz}</span>${warningDot(warns)}`;
       } else {
         html += `<span class="roster-empty">비어있음</span>`;
       }
@@ -2631,6 +2789,31 @@ function renderRoster() {
 
   blueEl.innerHTML = makeRows(blueTeam, 'blue');
   redEl.innerHTML  = makeRows(redTeam,  'red');
+
+  // 미러 박스 비활성화 오버레이 제어
+  updateMirrorDisabled();
+}
+
+function toggleReady(color) {
+  readyState[color] = !readyState[color];
+  renderRoster();
+}
+
+function updateMirrorDisabled() {
+  const bothReady = readyState.blue && readyState.red;
+  ['Blue','Red'].forEach(t => {
+    const el = document.getElementById('mirrorDisabled' + t);
+    if (el) el.style.display = bothReady ? 'none' : 'flex';
+    // 승리/패배 버튼도 비활성화
+    const btns = document.getElementById('mirrorBtns' + t);
+    if (btns) {
+      btns.querySelectorAll('button').forEach(b => {
+        b.disabled = !bothReady;
+        b.style.opacity = bothReady ? '1' : '0.4';
+        b.style.cursor = bothReady ? 'pointer' : 'not-allowed';
+      });
+    }
+  });
 }
 
 // ─── 미러 팀박스 렌더 ───
@@ -3051,5 +3234,363 @@ renderMirror();
 
 </script>
 
-</body>
-</html>
+<script>
+// ─── 내전 시작 화면 ───
+async function openMatchScreen() {
+  const size = parseInt(document.getElementById('teamSize')?.value || 5);
+
+  let _champNameCache = null;
+  async function getChampNameMap() {
+    if (_champNameCache) return _champNameCache;
+    try {
+      // 최신 버전 자동 감지
+      const verRes = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+      const versions = await verRes.json();
+      const latestVer = versions[0];
+      const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVer}/data/ko_KR/champion.json`);
+      const data = await res.json();
+      _champNameCache = {};
+      Object.entries(data.data).forEach(([engId, info]) => {
+        _champNameCache[info.name] = engId;                   // 원본 이름 (예: "리 신")
+        _champNameCache[info.name.replace(/ /g,'')] = engId; // 공백 제거 (예: "리신")
+        _champNameCache[engId] = engId;                       // 영문 ID
+      });
+      // 이미지 URL도 최신 버전으로
+      _champNameCache['_version'] = latestVer;
+    } catch(e) { _champNameCache = {}; }
+    return _champNameCache;
+  }
+
+  function champImg(name, map) {
+    if (!name || !map) return '';
+    // DDragon 미반영 챔피언 - GitHub 이미지로 대체
+    const customChamps = {
+      '유나라': 'https://raw.githubusercontent.com/youtubetakq/TAKQ/main/유나라.png',
+      '자헨':   'https://raw.githubusercontent.com/youtubetakq/TAKQ/main/자헨.png',
+    };
+    if (customChamps[name]) return customChamps[name];
+    const eng = map[name] || name;
+    const ver = map['_version'] || '15.8.1';
+    return `https://ddragon.leagueoflegends.com/cdn/${ver}/img/champion/${eng}.png`;
+  }
+
+  const LANE_ORDER = ['top','jungle','middle','bottom','utility'];
+  function laneIcon(posIdx) {
+    return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-${LANE_ORDER[posIdx]||'top'}.png`;
+  }
+
+  function getPlayerScore(p) {
+    if (!p) return 0;
+    const db = p.dbIdx >= 0 ? playerDB[p.dbIdx] : null;
+    const wins = db ? (db.wins||0) : 0;
+    const loses = db ? (db.loses||0) : 0;
+    const rate = (wins+loses) ? wins/(wins+loses) : 0.5;
+    return (p.pts||0) * (0.7 + rate * 0.6);
+  }
+
+  function tc(tier) {
+    const t = (tier||'').toLowerCase();
+    if(t.includes('브론즈')) return 'tier-b';
+    if(t.includes('실버')) return 'tier-s';
+    if(t.includes('골드')) return 'tier-g';
+    if(t.includes('플레')) return 'tier-p';
+    if(t.includes('에메')) return 'tier-e';
+    if(t.includes('다이')) return 'tier-d';
+    if(t.includes('마스터')) return 'tier-m';
+    if(t.includes('그랜드')) return 'tier-gm';
+    if(t.includes('챌린저')) return 'tier-c';
+    return 'tier-s';
+  }
+
+  const MAIN = 90;
+  const SUB  = 22;
+
+  function buildChampBlock(p, posIdx, champMap) {
+    const isEmpty = !p;
+    const db = (!isEmpty && p.dbIdx >= 0) ? playerDB[p.dbIdx] : null;
+    const chzz = db ? db.chzz : (p ? p.name : '');
+    const lol  = db ? db.lol  : (p ? p.name : '');
+    const tier = p ? p.tier : '';
+    let champs = db ? (db.mainChamps||[]) : [];
+    if (db && db.subPos && db.subPos.includes(p?.pos) && db.subChamps && db.subChamps[p.pos]) champs = db.subChamps[p.pos];
+    champs = champs.slice(0,5);
+    const main = champs[0]||null;
+    const subs = champs.slice(1,5);
+
+    const mainImg = main
+      ? `<img src="${champImg(main,champMap)}" width="${MAIN}" height="${MAIN}" style="object-fit:cover;border-radius:6px;display:block;" onerror="this.style.background='#2a2a4a'">`
+      : `<div style="width:${MAIN}px;height:${MAIN}px;background:rgba(255,255,255,0.05);border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.15);font-size:10px;">${isEmpty?'비어있음':'미등록'}</div>`;
+
+    const subsHtml = subs.length
+      ? `<div style="display:flex;gap:2px;width:${MAIN}px;margin-top:3px;">${subs.map(c=>`<img src="${champImg(c,champMap)}" style="flex:1;min-width:0;height:${SUB}px;object-fit:cover;border-radius:3px;" onerror="this.style.background='#2a2a4a'">`).join('')}</div>`
+      : `<div style="height:${SUB+3}px;width:${MAIN}px;"></div>`;
+
+    const tierHtml = tier
+      ? `<div class="tbadge ${tc(tier)}" style="width:${MAIN}px;text-align:center;margin-top:4px;font-size:11px;padding:3px 0;">${tier}</div>`
+      : `<div style="width:${MAIN}px;height:20px;margin-top:4px;"></div>`;
+
+    const nameHtml = `<div style="width:${MAIN}px;text-align:center;margin-top:3px;overflow:hidden;">
+      <div style="font-size:11px;font-weight:700;color:#e0e8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:${MAIN}px;">${lol}</div>
+      <div style="font-size:10px;color:#00ffa3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:${MAIN}px;margin-top:1px;">${chzz}</div>
+    </div>`;
+
+    return `<div style="display:flex;flex-direction:column;align-items:center;opacity:${isEmpty?'0.25':'1'};">
+      ${mainImg}${subsHtml}${tierHtml}${nameHtml}
+    </div>`;
+  }
+
+  // 전체 중앙 영역 빌드 (히스토리박스 + 그래프 + 게이지 한번에)
+  function buildCenterArea(bp, rp, rowIdx, champMap) {
+    const bluePct_score = (() => {
+      const bs = getPlayerScore(bp), rs = getPlayerScore(rp);
+      const t = bs + rs || 1;
+      return Math.round((bs/t)*100);
+    })();
+    const redPct_score = 100 - bluePct_score;
+    const delay = (0.6 + rowIdx*0.1).toFixed(2);
+
+    // 히스토리 데이터
+    function getGames(p) {
+      const db = (p && p.dbIdx >= 0) ? playerDB[p.dbIdx] : null;
+      const chzz = db ? db.chzz : (p ? p.name : null);
+      if (!chzz) return [];
+      return matchRecords.filter(r => r.blueNames.includes(chzz) || r.redNames.includes(chzz)).slice(0, 9);
+    }
+
+    function histHtml(p, side) {
+      const S = 22;
+      const db = (p && p.dbIdx >= 0) ? playerDB[p.dbIdx] : null;
+      const chzz = db ? db.chzz : (p ? p.name : null);
+      const games = getGames(p);
+      const cells = Array(9).fill(null).map((_, i) => {
+        const r = games[i];
+        if (!r) return `<div style="width:${S}px;height:${S}px;border-radius:3px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);box-sizing:border-box;"></div>`;
+        const inBlue = r.blueNames.includes(chzz);
+        const isWin = (inBlue && r.winner==='blue') || (!inBlue && r.winner==='red');
+        const bdr = isWin ? '2px solid #4a7fe8' : '2px solid #e84a4a';
+        const bg  = isWin ? 'rgba(74,127,232,0.2)' : 'rgba(232,74,74,0.2)';
+        const cn = inBlue ? (r.blueChamps&&r.blueChamps[chzz]) : (r.redChamps&&r.redChamps[chzz]);
+        const img = cn ? champImg(cn, champMap) : '';
+        return `<div style="width:${S}px;height:${S}px;border-radius:3px;border:${bdr};background:${bg};overflow:hidden;box-sizing:border-box;">
+          ${img ? `<img src="${img}" width="${S}" height="${S}" style="object-fit:cover;display:block;" onerror="this.style.display='none'">` : ''}
+        </div>`;
+      });
+      const rows3 = [cells.slice(0,3), cells.slice(3,6), cells.slice(6,9)];
+      return `<div style="display:flex;flex-direction:column;gap:2px;">${rows3.map(r=>`<div style="display:flex;gap:2px;">${r.join('')}</div>`).join('')}</div>`;
+    }
+
+    // 그래프 SVG
+    function buildSvg() {
+      const W = 600, H = 120, pad = 12, r = 5;
+      const bdb = (bp && bp.dbIdx >= 0) ? playerDB[bp.dbIdx] : null;
+      const rdb = (rp && rp.dbIdx >= 0) ? playerDB[rp.dbIdx] : null;
+      function getHist(p, db) {
+        if (!p || !db) return [];
+        const chzz = db.chzz;
+        const games = matchRecords.filter(r => r.blueNames.includes(chzz)||r.redNames.includes(chzz)).slice(0,10).reverse();
+        return games.map(r => { const inBlue=r.blueNames.includes(chzz); return (inBlue&&r.winner==='blue')||(!inBlue&&r.winner==='red')?1:0; });
+      }
+      const bHist = getHist(bp, bdb);
+      const rHist = getHist(rp, rdb);
+      const cols = Math.max(bHist.length, rHist.length, 3);
+
+      function drawLine(hist, color, fid) {
+        if (!hist.length) return '';
+        const n = Math.max(hist.length, 2);
+        const step = (W-pad*2)/(n-1);
+        const levels = []; let lv = 5;
+        for (let i=0;i<hist.length;i++) {
+          if (i>0) { const p=hist[i-1],c=hist[i]; if(p===c) lv=c===1?Math.max(lv-1,0):Math.min(lv+1,10); }
+          levels.push(lv);
+        }
+        const rH=(H-pad*2)/10;
+        const xs=hist.map((_,i)=>pad+i*step);
+        const ys=levels.map(l=>pad+l*rH);
+        let path=`M${xs[0]},${ys[0]}`;
+        for(let i=1;i<xs.length;i++) path+=` L${xs[i]},${ys[i]}`;
+        const dots=hist.map((v,i)=>`<circle cx="${xs[i]}" cy="${ys[i]}" r="${r}" fill="${color}" stroke="#1a1b2e" stroke-width="2" filter="url(#${fid})"/>`).join('');
+        return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" filter="url(#${fid})"/>${dots}`;
+      }
+      const grid = Array.from({length:cols},(_,i)=>{
+        const x=pad+i*((W-pad*2)/(cols-1||1));
+        return `<line x1="${x}" y1="${pad}" x2="${x}" y2="${H-pad}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+      }).join('');
+      const midLine=`<line x1="${pad}" y1="${H/2}" x2="${W-pad}" y2="${H/2}" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3,3"/>`;
+      const winLbl=`<text x="${pad+2}" y="${pad+10}" font-size="8" fill="rgba(255,255,255,0.25)">WIN</text>`;
+      const loseLbl=`<text x="${pad+2}" y="${H-pad+2}" font-size="8" fill="rgba(255,255,255,0.25)">LOSE</text>`;
+      const noData=(!bHist.length&&!rHist.length)?`<text x="${W/2}" y="${H/2+4}" font-size="9" fill="rgba(255,255,255,0.2)" text-anchor="middle">전적 없음</text>`:'';
+      return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" style="display:block;">
+        <defs>
+          <filter id="glow-b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glow-r" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        ${grid}${midLine}${winLbl}${loseLbl}
+        ${drawLine(bHist,'#4a9fff','glow-b')}
+        ${drawLine(rHist,'#ff6a6a','glow-r')}
+        ${noData}
+      </svg>`;
+    }
+
+    // 히스토리 박스 너비: 22*3 + 2*2 = 70px
+    const HIST_W = 70;
+
+    return `<div class="gauge-anim" style="animation-delay:${delay}s;flex:1;min-width:0;display:flex;flex-direction:column;gap:0;">
+      <!-- 그래프 + 히스토리 박스 가로 배치 -->
+      <div style="display:flex;align-items:center;gap:4px;width:100%;">
+        <!-- 블루 히스토리: 왼쪽 고정 너비 -->
+        <div style="width:${HIST_W}px;flex-shrink:0;">${histHtml(bp,'blue')}</div>
+        <!-- 그래프: 남은 공간 -->
+        <div style="flex:1;min-width:0;">${buildSvg()}</div>
+        <!-- 레드 히스토리: 오른쪽 고정 너비 -->
+        <div style="width:${HIST_W}px;flex-shrink:0;">${histHtml(rp,'red')}</div>
+      </div>
+      <!-- 게이지 바: 히스토리 너비 맞춤 -->
+      <div style="display:flex;align-items:center;gap:4px;width:100%;margin-top:4px;">
+        <div style="width:${HIST_W}px;flex-shrink:0;text-align:right;">
+          <span style="font-size:12px;color:#6ab0ff;font-weight:700;">${bluePct_score}%</span>
+        </div>
+        <div style="flex:1;height:11px;background:rgba(255,255,255,0.08);border-radius:5px;overflow:hidden;display:flex;">
+          <div style="width:${bluePct_score}%;background:linear-gradient(90deg,#4a7fe8,#7ab0ff);"></div>
+          <div style="width:${redPct_score}%;background:linear-gradient(90deg,#e84a4a,#ff6a6a);"></div>
+        </div>
+        <div style="width:${HIST_W}px;flex-shrink:0;">
+          <span style="font-size:12px;color:#ff6a6a;font-weight:700;">${redPct_score}%</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+    function findPlayerByPos(team, posIdx) {
+    // 정확히 해당 포지션인 플레이어 먼저 찾기
+    const exact = team.find(p => p && p.pos === posIdx);
+    if (exact) return exact;
+    // 없으면 'all(5)' 포지션인 플레이어 중 아직 다른 행에 배치 안 된 플레이어 찾기
+    // (이미 다른 posIdx 행에서 사용된 all 플레이어는 제외)
+    return team.find(p => p && p.pos === 5) || null;
+  }
+
+  // 이미 사용된 all 플레이어 추적을 위해 buildRows 전체를 감싸는 함수
+  function buildAllRows(champMap) {
+    const usedBlueAll = new Set();
+    const usedRedAll  = new Set();
+    let rows = '';
+    for (let i = 0; i < 5; i++) {
+      // 블루팀: 정확한 포지션 우선, 없으면 미사용 all 플레이어
+      const bp = blueTeam.find(p => p && p.pos === i)
+        || blueTeam.find(p => p && p.pos === 5 && !usedBlueAll.has(p.name))
+        || null;
+      if (bp && bp.pos === 5) usedBlueAll.add(bp.name);
+
+      // 레드팀: 정확한 포지션 우선, 없으면 미사용 all 플레이어
+      const rp = redTeam.find(p => p && p.pos === i)
+        || redTeam.find(p => p && p.pos === 5 && !usedRedAll.has(p.name))
+        || null;
+      if (rp && rp.pos === 5) usedRedAll.add(rp.name);
+
+      rows += buildRow(i, champMap, i, bp, rp);
+    }
+    return rows;
+  }
+
+  function buildRow(posIdx, champMap, rowIdx, bp, rp) {
+    const delay = (rowIdx * 0.12).toFixed(2);
+    const laneIconHtml = `<img src="${laneIcon(posIdx)}" width="26" height="26" style="object-fit:contain;filter:brightness(0) invert(1);opacity:0.8;flex-shrink:0;" onerror="this.style.display='none'">`;
+    return `<div class="row-anim" style="animation-delay:${delay}s;display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:3px;">
+      ${laneIconHtml}
+      <div style="background:rgba(15,30,70,0.6);border:1px solid rgba(74,127,232,0.3);border-radius:7px;padding:6px;flex-shrink:0;">
+        ${buildChampBlock(bp, posIdx, champMap)}
+      </div>
+      ${buildCenterArea(bp, rp, rowIdx, champMap)}
+      <div style="background:rgba(70,15,15,0.6);border:1px solid rgba(255,68,68,0.3);border-radius:7px;padding:6px;flex-shrink:0;">
+        ${buildChampBlock(rp, posIdx, champMap)}
+      </div>
+      ${laneIconHtml}
+    </div>`;
+  }
+
+  const champMap = await getChampNameMap();
+  const rows = buildAllRows(champMap);
+
+  const html = `<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>내전 경기 진행중</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;background:#1a1b2e;padding:12px 0;color:white;overflow-x:hidden;}
+.tbadge{display:block;border-radius:4px;font-weight:700;white-space:nowrap;}
+.tier-b{background:#8B5A2B;color:#f5d9b0;}.tier-s{background:#6b6b6b;color:#e0e0e0;}
+.tier-g{background:#7a6000;color:#ffd700;}.tier-p{background:#0e7a6a;color:#60f0d0;}
+.tier-e{background:#1a7a3a;color:#60e890;}.tier-d{background:#1a5aaa;color:#90c8ff;}
+.tier-m{background:#6a0080;color:#e080ff;}.tier-gm{background:#9a1a1a;color:#ffaaaa;}
+.tier-c{background:#00aadd;color:#fff;}
+
+/* 애니메이션 */
+@keyframes fadeSlideUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+.row-anim {
+  opacity:0;
+  animation: fadeSlideUp 0.5s ease forwards;
+}
+.gauge-anim {
+  opacity:0;
+  animation: fadeIn 0.5s ease forwards;
+}
+</style>
+</head><body>
+<div id="mainWrap" style="width:1300px;transform-origin:top center;overflow:hidden;">
+  <!-- 헤더 (애니메이션 없이 고정) -->
+  <div style="text-align:center;margin-bottom:5px;">
+    <div style="font-size:16px;font-weight:900;letter-spacing:3px;color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,0.8),0 0 20px rgba(255,215,0,0.4);">내전 경기 진행중</div>
+    <div style="font-size:9px;color:#444;margin-top:1px;letter-spacing:2px;">INTERNAL MATCH TOURNAMENT</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+    <div style="width:34px;flex-shrink:0;"></div>
+    <div style="flex:1;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px;color:#7ac0ff;background:rgba(74,127,232,0.15);border:1.5px solid #3a8fff;border-radius:6px;padding:5px;text-shadow:0 0 8px rgba(74,127,232,0.8);">● BLUE TEAM</div>
+    <div style="min-width:100px;text-align:center;font-size:14px;font-weight:900;color:rgba(255,255,255,0.2);">VS</div>
+    <div style="flex:1;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px;color:#ff6a6a;background:rgba(255,68,68,0.15);border:1.5px solid #ff4444;border-radius:6px;padding:5px;text-shadow:0 0 8px rgba(255,68,68,0.8);">● RED TEAM</div>
+    <div style="width:34px;flex-shrink:0;"></div>
+  </div>
+
+  <!-- 포지션별 행 (애니메이션 적용) -->
+  ${rows}
+
+  <!-- 내전 경기 끝 버튼 -->
+  <div style="text-align:center;margin-top:6px;">
+    <button onclick="window.close()" style="padding:12px 48px;border-radius:8px;background:linear-gradient(135deg,rgba(232,74,74,0.3),rgba(180,30,30,0.4));border:1.5px solid rgba(255,68,68,0.6);color:#ff8a8a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(232,74,74,0.5),rgba(180,30,30,0.6))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(232,74,74,0.3),rgba(180,30,30,0.4))'">
+      내전 경기 끝
+    </button>
+  </div>
+</div>
+<${'script'}>
+function fitScale() {
+  const wrap = document.getElementById('mainWrap');
+  if (!wrap) return;
+  const vw = window.innerWidth - 20;
+  const vh = window.innerHeight - 20;
+  const scaleX = vw / 1300;
+  const scaleY = vh / wrap.offsetHeight;
+  const scale = Math.min(scaleX, scaleY, 1);
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.transformOrigin = 'top center';
+  wrap.style.marginLeft = ((vw - 1300 * scale) / 2) + 'px';
+  document.body.style.height = (wrap.offsetHeight * scale + 10) + 'px';
+}
+window.addEventListener('resize', fitScale);
+window.addEventListener('load', fitScale);
+setTimeout(fitScale, 300);
+</${'script'}>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  if (win) { win.document.write(html); win.document.close(); }
+  else alert('팝업이 차단됐어요.');
+}
+</script>
